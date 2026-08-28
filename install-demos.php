@@ -82,16 +82,17 @@ $dbError = null;
 $dbConnected = false;
 $connectionMethod = null;
 
-// Function to test database connection
-function testDatabaseConnection($host, $database, $username, $password, $port = '3306') {
+// Function to test database connection (supports MySQL and PostgreSQL)
+function testDatabaseConnection($host, $database, $username, $password, $port, $driver = 'mysql') {
     try {
-        $testPdo = new PDO(
-            "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4",
-            $username,
-            $password,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
-        return $testPdo;
+        $dsn = '';
+        if ($driver === 'pgsql') {
+            $dsn = "pgsql:host=$host;port=$port;dbname=$database;options='--client_encoding=UTF8'";
+        } else { // default to mysql
+            $dsn = "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4";
+        }
+        $pdo = new PDO($dsn, $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        return $pdo;
     } catch (PDOException $e) {
         return false;
     }
@@ -155,12 +156,13 @@ if ($envLoaded && !$pdo) {
     $db_user = getenv('DB_USERNAME') ?: getenv('MYSQL_USER') ?: getenv('DB_USER') ?: null;
     $db_pass = getenv('DB_PASSWORD') ?: getenv('MYSQL_PASSWORD') ?: getenv('DB_PASS') ?: '';
     $db_port = getenv('DB_PORT') ?: getenv('MYSQL_PORT') ?: '3306';
+    $db_driver = getenv('DB_DRIVER') ?: 'mysql';
     
     if ($db_name && $db_user !== null) {
-        $pdo = testDatabaseConnection($db_host, $db_name, $db_user, $db_pass, $db_port);
+        $pdo = testDatabaseConnection($db_host, $db_name, $db_user, $db_pass, $db_port, $db_driver);
         if ($pdo) {
             $dbConnected = true;
-            $connectionMethod = "Environment variables from .env";
+            $connectionMethod = "Environment variables from .env (driver: $db_driver)";
             if (isset($_GET['debug'])) {
                 echo "\n";
             }
@@ -183,16 +185,18 @@ if (!$pdo) {
             try {
                 $dbConfig = include $configPath;
                 if (is_array($dbConfig)) {
+                    $driver = $dbConfig['driver'] ?? 'mysql';
                     $pdo = testDatabaseConnection(
                         $dbConfig['host'] ?? 'localhost',
                         $dbConfig['database'] ?? '',
                         $dbConfig['username'] ?? '',
                         $dbConfig['password'] ?? '',
-                        $dbConfig['port'] ?? '3306'
+                        $dbConfig['port'] ?? '3306',
+                        $driver
                     );
                     if ($pdo) {
                         $dbConnected = true;
-                        $connectionMethod = "Config file: " . $configPath;
+                        $connectionMethod = "Config file: " . $configPath . " (driver: $driver)";
                         if (isset($_GET['debug'])) {
                             echo "\n";
                         }
@@ -214,7 +218,8 @@ if (!$pdo && isset($_GET['manual_db'])) {
         'database' => 'playserverlist_rer',
         'username' => 'root',           // Change this
         'password' => '',                // Change this
-        'port' => '3306'
+        'port' => '3306',
+        'driver' => 'mysql'             // Change to 'pgsql' for PostgreSQL
     ];
     
     $pdo = testDatabaseConnection(
@@ -222,12 +227,13 @@ if (!$pdo && isset($_GET['manual_db'])) {
         $manual_config['database'],
         $manual_config['username'],
         $manual_config['password'],
-        $manual_config['port']
+        $manual_config['port'],
+        $manual_config['driver']
     );
     
     if ($pdo) {
         $dbConnected = true;
-        $connectionMethod = "Manual configuration (testing mode)";
+        $connectionMethod = "Manual configuration (testing mode, driver: " . $manual_config['driver'] . ")";
         if (isset($_GET['debug'])) {
             echo "\n";
         }
