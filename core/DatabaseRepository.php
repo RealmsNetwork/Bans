@@ -20,11 +20,13 @@ class DatabaseRepository
 {
     private PDO $connection;
     private string $tablePrefix;
+    private string $driver;
     
     public function __construct(PDO $connection, string $tablePrefix = 'litebans_')
     {
         $this->connection = $connection;
         $this->tablePrefix = $tablePrefix;
+        $this->driver = $connection->getAttribute(PDO::ATTR_DRIVER_NAME);
     }
     
     public function getConnection(): PDO
@@ -35,6 +37,61 @@ class DatabaseRepository
     public function getTablePrefix(): string
     {
         return $this->tablePrefix;
+    }
+    
+    public function getDriver(): string
+    {
+        return $this->driver;
+    }
+    
+    /**
+     * Cast a column to integer in a database-agnostic way
+     */
+    private function castInt(string $column): string
+    {
+        if ($this->driver === 'pgsql') {
+            return "CAST({$column} AS INTEGER)";
+        }
+        // MySQL
+        return "CAST({$column} AS UNSIGNED)";
+    }
+    
+    /**
+     * Convert Unix timestamp in milliseconds to a date string for grouping
+     */
+    private function dateGroup(string $column, string $format = 'Y-m-d'): string
+    {
+        if ($this->driver === 'pgsql') {
+            // to_timestamp expects seconds with fractional part
+            return "TO_CHAR(TO_TIMESTAMP({$column}/1000.0), 'YYYY-MM-DD')";
+        }
+        // MySQL
+        return "DATE(FROM_UNIXTIME({$column}/1000))";
+    }
+    
+    /**
+     * Get day of week (1-7, Monday=1) from timestamp in milliseconds
+     */
+    private function dayOfWeek(string $column): string
+    {
+        if ($this->driver === 'pgsql') {
+            // EXTRACT(DOW) returns 0-6 (Sunday=0), convert to Monday=1
+            return "EXTRACT(DOW FROM TO_TIMESTAMP({$column}/1000.0))";
+        }
+        // MySQL returns 1-7 (Sunday=1)
+        return "DAYOFWEEK(FROM_UNIXTIME({$column}/1000))";
+    }
+    
+    /**
+     * Get day name from timestamp in milliseconds
+     */
+    private function dayName(string $column): string
+    {
+        if ($this->driver === 'pgsql') {
+            return "TO_CHAR(TO_TIMESTAMP({$column}/1000.0), 'Day')";
+        }
+        // MySQL
+        return "DAYNAME(FROM_UNIXTIME({$column}/1000))";
     }
     
     public function getBans(int $limit = 20, int $offset = 0, bool $activeOnly = true, string $sort = 'time', string $order = 'DESC', bool $showSilent = true): array
@@ -77,9 +134,12 @@ class DatabaseRepository
                 $where .= ' AND (b.silent = 0 OR b.silent IS NULL)';
             }
             
+            $activeCast = $this->castInt('b.active');
+            $silentCast = $this->castInt('b.silent');
+            
             $sql = "SELECT b.id, b.uuid, b.reason, b.banned_by_name, b.banned_by_uuid, b.time, b.until, 
-                           CAST(b.active AS UNSIGNED) as active, b.removed_by_name, b.removed_by_uuid, 
-                           b.removed_by_date, CAST(b.silent AS UNSIGNED) as silent,
+                           {$activeCast} as active, b.removed_by_name, b.removed_by_uuid, 
+                           b.removed_by_date, {$silentCast} as silent,
                            b.server_origin, b.server_scope,
                            h.name as player_name
                     FROM {$table} b
@@ -114,13 +174,11 @@ class DatabaseRepository
             $table = $this->tablePrefix . 'mutes';
             $historyTable = $this->tablePrefix . 'history';
             
-            // Validate sort and order parameters
             $allowedSorts = ['id', 'name', 'server', 'reason', 'banned_by_name', 'time', 'until', 'active'];
             $sort = in_array($sort, $allowedSorts) ? $sort : 'time';
             $order = strtoupper($order);
             $order = in_array($order, ['ASC', 'DESC']) ? $order : 'DESC';
             
-            // Map sort field to correct column
             $sortColumn = match($sort) {
                 'name' => 'h.name',
                 'reason' => 'm.reason',
@@ -136,14 +194,16 @@ class DatabaseRepository
             
             $where = $activeOnly ? 'WHERE m.active = 1 AND m.uuid IS NOT NULL AND m.uuid != \'#\'' : 'WHERE m.uuid IS NOT NULL AND m.uuid != \'#\'';
             
-            // Add silent filter if needed
             if (!$showSilent) {
                 $where .= ' AND (m.silent = 0 OR m.silent IS NULL)';
             }
             
+            $activeCast = $this->castInt('m.active');
+            $silentCast = $this->castInt('m.silent');
+            
             $sql = "SELECT m.id, m.uuid, m.reason, m.banned_by_name, m.banned_by_uuid, m.time, m.until, 
-                           CAST(m.active AS UNSIGNED) as active, m.removed_by_name, m.removed_by_uuid, 
-                           m.removed_by_date, CAST(m.silent AS UNSIGNED) as silent,
+                           {$activeCast} as active, m.removed_by_name, m.removed_by_uuid, 
+                           m.removed_by_date, {$silentCast} as silent,
                            m.server_origin, m.server_scope,
                            h.name as player_name
                     FROM {$table} m
@@ -178,13 +238,11 @@ class DatabaseRepository
             $table = $this->tablePrefix . 'warnings';
             $historyTable = $this->tablePrefix . 'history';
             
-            // Validate sort and order parameters
             $allowedSorts = ['id', 'name', 'server', 'reason', 'banned_by_name', 'time', 'active'];
             $sort = in_array($sort, $allowedSorts) ? $sort : 'time';
             $order = strtoupper($order);
             $order = in_array($order, ['ASC', 'DESC']) ? $order : 'DESC';
             
-            // Map sort field to correct column
             $sortColumn = match($sort) {
                 'name' => 'h.name',
                 'reason' => 'w.reason',
@@ -199,12 +257,15 @@ class DatabaseRepository
             
             $currentTime = time() * 1000; // Current time in milliseconds
             
+            $warnedCast = $this->castInt('w.warned');
+            $activeCast = $this->castInt('w.active');
+            
             $sql = "SELECT w.id, w.uuid, w.reason, w.banned_by_name, w.banned_by_uuid, w.time, 
-                           CAST(w.warned AS UNSIGNED) as warned, 
+                           {$warnedCast} as warned, 
                            w.until,
                            CASE 
                                WHEN w.until IS NOT NULL AND w.until > 0 AND w.until <= :current_time THEN 0
-                               ELSE CAST(w.active AS UNSIGNED)
+                               ELSE {$activeCast}
                            END as active,
                            w.server_origin, w.server_scope,
                            h.name as player_name
@@ -241,13 +302,11 @@ class DatabaseRepository
             $table = $this->tablePrefix . 'kicks';
             $historyTable = $this->tablePrefix . 'history';
             
-            // Validate sort and order parameters
             $allowedSorts = ['id', 'name', 'server', 'reason', 'banned_by_name', 'time', 'active'];
             $sort = in_array($sort, $allowedSorts) ? $sort : 'time';
             $order = strtoupper($order);
             $order = in_array($order, ['ASC', 'DESC']) ? $order : 'DESC';
             
-            // Map sort field to correct column
             $sortColumn = match($sort) {
                 'name' => 'h.name',
                 'reason' => 'k.reason',
@@ -260,8 +319,10 @@ class DatabaseRepository
             
             $orderClause = "{$sortColumn} {$order}";
             
+            $activeCast = $this->castInt('k.active');
+            
             $sql = "SELECT k.id, k.uuid, k.reason, k.banned_by_name, k.banned_by_uuid, k.time,
-                           CAST(k.active AS UNSIGNED) as active,
+                           {$activeCast} as active,
                            k.server_origin, k.server_scope,
                            h.name as player_name
                     FROM {$table} k
@@ -293,7 +354,6 @@ class DatabaseRepository
     public function getPlayerPunishments(string $identifier): array
     {
         try {
-            // Sanitize input
             $identifier = trim($identifier);
             if (empty($identifier)) {
                 return [];
@@ -306,12 +366,10 @@ class DatabaseRepository
                 $field = 'uuid';
                 $value = $identifier;
             } else {
-                // Validate username format
                 if (!SecurityManager::validateUsername($identifier)) {
                     return [];
                 }
                 
-                // If searching by name, first get UUID from history (case-insensitive search)
                 $stmt = $this->connection->prepare("SELECT uuid FROM {$historyTable} WHERE LOWER(name) = LOWER(:name) ORDER BY date DESC LIMIT 1");
                 $stmt->bindValue(':name', $identifier, PDO::PARAM_STR);
                 $stmt->execute();
@@ -339,7 +397,7 @@ class DatabaseRepository
                 $columns = "'{$table}' as type, id, uuid, reason, banned_by_name, time";
                 foreach ($extraColumns as $col) {
                     if ($col === 'active' || $col === 'warned') {
-                        $columns .= ", CAST({$col} AS UNSIGNED) as {$col}";
+                        $columns .= ", " . $this->castInt($col) . " as {$col}";
                     } else {
                         $columns .= ", {$col}";
                     }
@@ -359,7 +417,6 @@ class DatabaseRepository
                 $results = array_merge($results, $tableResults);
             }
             
-            // Sort by time descending
             usort($results, function($a, $b) {
                 return $b['time'] <=> $a['time'];
             });
@@ -373,8 +430,6 @@ class DatabaseRepository
     
     public function getStats(): array
     {
-        // 60-sekundový file cache - staty sa nemenia každú sekundu,
-        // a táto metóda je v slow logu zďaleka najčastejšia.
         $cacheDir = dirname(__DIR__) . '/data';
         $cacheFile = $cacheDir . '/.stats_cache.json';
         $cacheTtl = 60;
@@ -414,7 +469,6 @@ class DatabaseRepository
             }
         }
 
-        // Ulož cache (tichý fail ak nie je write access)
         if (is_dir($cacheDir) && is_writable($cacheDir)) {
             @file_put_contents($cacheFile, json_encode($stats), LOCK_EX);
         }
@@ -469,7 +523,6 @@ class DatabaseRepository
         try {
             $fullTable = $this->tablePrefix . $table;
             
-            // For bans and mutes, support activeOnly filter
             if (in_array($table, ['bans', 'mutes'])) {
                 $where = $activeOnly ? 'WHERE active = 1 AND uuid IS NOT NULL AND uuid != \'#\'' : 'WHERE uuid IS NOT NULL AND uuid != \'#\'';
             } else {
@@ -511,7 +564,6 @@ class DatabaseRepository
             $result = $stmt->fetch();
             
             if ($result) {
-                // Convert BIT fields to integers
                 $bitFields = ['active', 'silent', 'ipban', 'warned'];
                 foreach ($bitFields as $field) {
                     if (isset($result[$field])) {
@@ -542,8 +594,20 @@ class DatabaseRepository
     {
         try {
             $fullTable = $this->tablePrefix . $table;
-            $stmt = $this->connection->query("DESCRIBE {$fullTable}");
-            return $stmt->fetchAll();
+            if ($this->driver === 'pgsql') {
+                $sql = "SELECT column_name, data_type, is_nullable, column_default 
+                        FROM information_schema.columns 
+                        WHERE table_name = :table 
+                        ORDER BY ordinal_position";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->bindValue(':table', $fullTable);
+                $stmt->execute();
+                return $stmt->fetchAll();
+            } else {
+                // MySQL
+                $stmt = $this->connection->query("DESCRIBE {$fullTable}");
+                return $stmt->fetchAll();
+            }
         } catch (PDOException $e) {
             error_log("Error getting table structure for {$table}: " . $e->getMessage());
             return [];
@@ -631,7 +695,6 @@ class DatabaseRepository
                 }
             }
             
-            // Sort by total punishments
             uasort($results, function($a, $b) {
                 return $b['total_punishments'] <=> $a['total_punishments'];
             });
@@ -677,12 +740,13 @@ class DatabaseRepository
             
             foreach ($tables as $table) {
                 $fullTable = $this->tablePrefix . $table;
+                $dateGroup = $this->dateGroup('time');
                 
-                $sql = "SELECT DATE(FROM_UNIXTIME(time/1000)) as date, COUNT(*) as count
+                $sql = "SELECT {$dateGroup} as date, COUNT(*) as count
                         FROM {$fullTable}
                         WHERE time >= :since
                         AND uuid IS NOT NULL AND uuid != '#'
-                        GROUP BY DATE(FROM_UNIXTIME(time/1000))
+                        GROUP BY {$dateGroup}
                         ORDER BY date DESC";
                 
                 $stmt = $this->connection->prepare($sql);
@@ -749,14 +813,17 @@ class DatabaseRepository
             $sinceTimestamp = (time() - ($days * 24 * 60 * 60)) * 1000;
             $bansTable = $this->tablePrefix . 'bans';
             
+            $dow = $this->dayOfWeek('time');
+            $dayName = $this->dayName('time');
+            
             $sql = "SELECT 
-                        DAYOFWEEK(FROM_UNIXTIME(time/1000)) as day_of_week,
-                        DAYNAME(FROM_UNIXTIME(time/1000)) as day_name,
+                        {$dow} as day_of_week,
+                        {$dayName} as day_name,
                         COUNT(*) as count
                     FROM {$bansTable}
                     WHERE time >= :since
                     AND uuid IS NOT NULL AND uuid != '#'
-                    GROUP BY DAYOFWEEK(FROM_UNIXTIME(time/1000)), DAYNAME(FROM_UNIXTIME(time/1000))
+                    GROUP BY {$dow}, {$dayName}
                     ORDER BY day_of_week";
             
             $stmt = $this->connection->prepare($sql);
