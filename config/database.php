@@ -25,7 +25,7 @@ use core\EnvLoader;
 
 class DatabaseConfig
 {
-    private const REQUIRED_EXTENSIONS = ['pdo_mysql', 'intl', 'mbstring'];
+    private const REQUIRED_EXTENSIONS = ['pdo_mysql', 'pdo_pgsql', 'intl', 'mbstring'];
     
     private string $host;
     private int $port;
@@ -45,7 +45,23 @@ class DatabaseConfig
     
     private function validateExtensions(): void
     {
-        foreach (self::REQUIRED_EXTENSIONS as $ext) {
+        $driver = EnvLoader::get('DB_DRIVER', 'mysql');
+        $required = self::REQUIRED_EXTENSIONS;
+        
+        // Only require the PDO driver that matches the configured driver
+        if ($driver === 'pgsql') {
+            // Keep pdo_pgsql, remove pdo_mysql from required list
+            $required = array_filter($required, function($ext) {
+                return $ext !== 'pdo_mysql';
+            });
+        } else {
+            // Default to mysql, keep pdo_mysql, remove pdo_pgsql
+            $required = array_filter($required, function($ext) {
+                return $ext !== 'pdo_pgsql';
+            });
+        }
+        
+        foreach ($required as $ext) {
             if (!extension_loaded($ext)) {
                 throw new \RuntimeException("Required extension not loaded: {$ext}");
             }
@@ -75,6 +91,11 @@ class DatabaseConfig
         if (empty($this->username)) {
             throw new \InvalidArgumentException('Database username is required');
         }
+        
+        // Validate driver
+        if (!in_array($this->driver, ['mysql', 'pgsql'], true)) {
+            throw new \InvalidArgumentException('Unsupported database driver: ' . $this->driver);
+        }
     }
     
     /**
@@ -98,21 +119,33 @@ class DatabaseConfig
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
             \PDO::ATTR_EMULATE_PREPARES => false,
-            $this->getMysqlInitCommandAttribute() => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci",
             \PDO::ATTR_TIMEOUT => 30,
-            // Persistent connection
             \PDO::ATTR_PERSISTENT => true,
         ];
+        
+        // MySQL-specific options
+        if ($this->driver === 'mysql') {
+            $this->options[$this->getMysqlInitCommandAttribute()] = "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci";
+        }
     }
     
     public function createConnection(): \PDO
     {
-        $dsn = sprintf(
-            'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
-            $this->host,
-            $this->port,
-            $this->database
-        );
+        if ($this->driver === 'pgsql') {
+            $dsn = sprintf(
+                'pgsql:host=%s;port=%d;dbname=%s;options=\'--client_encoding=UTF8\'',
+                $this->host,
+                $this->port,
+                $this->database
+            );
+        } else {
+            $dsn = sprintf(
+                'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
+                $this->host,
+                $this->port,
+                $this->database
+            );
+        }
         
         try {
             $pdo = new \PDO($dsn, $this->username, $this->password, $this->options);
