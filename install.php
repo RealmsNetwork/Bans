@@ -54,7 +54,7 @@ DB_PORT=" . ($config['db_port'] ?? '3306') . "
 DB_NAME=" . ($config['db_name'] ?? '') . "
 DB_USER=" . ($config['db_user'] ?? '') . "
 DB_PASS=" . ($config['db_pass'] ?? '') . "
-DB_DRIVER=mysql
+DB_DRIVER=" . ($config['db_driver'] ?? 'mysql') . "
 TABLE_PREFIX=" . ($config['table_prefix'] ?? 'litebans_') . "
 
 # Site Configuration
@@ -311,15 +311,23 @@ DEMO_MODE=false
                     <div class="form-section">
                         <h5><i class="fas fa-database"></i> Database Configuration <span class="required-badge">* Required</span></h5>
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Database Host</label>
                                 <input type="text" class="form-control" name="db_host" value="localhost" required>
                                 <small class="form-text">Usually "localhost" or "127.0.0.1"</small>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Database Port</label>
-                                <input type="text" class="form-control" name="db_port" value="3306" required>
-                                <small class="form-text">Default MySQL port is 3306</small>
+                                <input type="text" class="form-control" name="db_port" id="db_port" value="3306" required>
+                                <small class="form-text" id="portHelp">Default MySQL port is 3306</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Database Driver</label>
+                                <select class="form-control" name="db_driver" id="db_driver" required>
+                                    <option value="mysql">MySQL</option>
+                                    <option value="pgsql">PostgreSQL</option>
+                                </select>
+                                <small class="form-text">Select your database type</small>
                             </div>
                         </div>
                         <div class="row">
@@ -360,7 +368,7 @@ DEMO_MODE=false
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Footer Site Name</label>
                                 <input type="text" class="form-control" name="footer_site_name">
-                                <small class="form-text">Name in footer copyright (Ă‚Â© Your Server 2024)</small>
+                                <small class="form-text">Name in footer copyright (Â© Your Server 2024)</small>
                             </div>
                         </div>
                         <div class="row">
@@ -564,7 +572,7 @@ DEMO_MODE=false
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Place Name</label>
-                                <input type="text" class="form-control" name="seo_geo_placename" placeholder="KoÄąË‡ice">
+                                <input type="text" class="form-control" name="seo_geo_placename" placeholder="Košice">
                                 <small class="form-text">City or location name</small>
                             </div>
                         </div>
@@ -818,6 +826,26 @@ DEMO_MODE=false
                 console.error('Failed to copy:', err);
             });
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const driverSelect = document.getElementById('db_driver');
+            const portInput = document.getElementById('db_port');
+            const portHelp = document.getElementById('portHelp');
+            function updatePort() {
+                if (driverSelect.value === 'pgsql') {
+                    portInput.value = '5432';
+                    portHelp.textContent = 'Default PostgreSQL port is 5432';
+                } else {
+                    portInput.value = '3306';
+                    portHelp.textContent = 'Default MySQL port is 3306';
+                }
+            }
+            if (driverSelect) {
+                driverSelect.addEventListener('change', updatePort);
+                // set initial value if driver is already selected (e.g., after validation)
+                updatePort();
+            }
+        });
     </script>
 </body>
 </html>
