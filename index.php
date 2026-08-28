@@ -102,25 +102,26 @@ HTML;
 function parseDatabaseError(PDOException $e): array {
     $code = $e->getCode();
     $message = $e->getMessage();
+    $sqlstate = $e->errorInfo[0] ?? '';
     
     // Default
     $userMessage = 'Unable to connect to the database.';
     $details = "Error: {$message}";
     
-    // Parse specific MySQL error codes
-    if ($code == 1045 || stripos($message, 'Access denied') !== false) {
+    // Parse specific error codes (MySQL numeric or PostgreSQL SQLSTATE)
+    if ($code == 1045 || stripos($message, 'Access denied') !== false || $sqlstate === '28P01' || stripos($message, 'password authentication failed') !== false) {
         $userMessage = 'Database access denied - invalid username or password.';
         $details = "Check DB_USER and DB_PASS in your .env file.\n\nOriginal error: {$message}";
-    } 
-    elseif ($code == 1049 || stripos($message, 'Unknown database') !== false) {
+    }
+    elseif ($code == 1049 || stripos($message, 'Unknown database') !== false || $sqlstate === '3D000' || (stripos($message, 'database') !== false && stripos($message, 'does not exist') !== false)) {
         $userMessage = 'Database does not exist.';
         $details = "Check DB_NAME in your .env file - the specified database was not found.\n\nOriginal error: {$message}";
     }
-    elseif ($code == 1044) {
+    elseif ($code == 1044 || stripos($message, 'access denied for user') !== false) {
         $userMessage = 'Database access denied - user lacks privileges.';
         $details = "The database user does not have permission to access this database.\n\nOriginal error: {$message}";
     }
-    elseif ($code == 2002 || stripos($message, 'Connection refused') !== false || stripos($message, 'No such file') !== false) {
+    elseif ($code == 2002 || $code == 2003 || stripos($message, 'Connection refused') !== false || stripos($message, 'No such file') !== false || $sqlstate === '08001' || $sqlstate === '08006' || stripos($message, 'could not connect to server') !== false) {
         $userMessage = 'Cannot connect to database server.';
         $details = "Check DB_HOST and DB_PORT in your .env file.\nThe database server may be down or not accepting connections.\n\nOriginal error: {$message}";
     }
@@ -128,22 +129,22 @@ function parseDatabaseError(PDOException $e): array {
         $userMessage = 'Database table not found.';
         $details = "Check TABLE_PREFIX in your .env file.\nMake sure LiteBans plugin has created the tables.\n\nOriginal error: {$message}";
     }
-    elseif ($code == 2006 || $code == 2013 || stripos($message, 'gone away') !== false) {
+    elseif ($code == 2006 || $code == 2013 || stripos($message, 'gone away') !== false || stripos($message, 'server closed the connection') !== false) {
         $userMessage = 'Database connection lost.';
         $details = "The connection to database was lost. Server may be overloaded.\n\nOriginal error: {$message}";
     }
-    elseif ($code == 1040) {
+    elseif ($code == 1040 || stripos($message, 'Too many connections') !== false) {
         $userMessage = 'Too many database connections.';
         $details = "The database server has too many connections. Try again later.\n\nOriginal error: {$message}";
     }
-    elseif (stripos($message, 'timeout') !== false) {
+    elseif (stripos($message, 'timeout') !== false || stripos($message, 'timed out') !== false) {
         $userMessage = 'Database connection timeout.';
         $details = "Connection to database timed out. Server may be slow or unreachable.\n\nOriginal error: {$message}";
     }
     
     return [
         'userMessage' => $userMessage,
-        'details' => $details . "\n\nError code: {$code}\nFile: {$e->getFile()}\nLine: {$e->getLine()}"
+        'details' => $details . "\n\nError code: {$code}\nSQLSTATE: {$sqlstate}\nFile: {$e->getFile()}\nLine: {$e->getLine()}"
     ];
 }
 
@@ -352,7 +353,27 @@ try {
 
     // Database connection - with detailed error handling
     try {
-        $connection = $dbConfig->createConnection();
+        // Get connection parameters from environment
+        $driver = core\EnvLoader::get('DB_DRIVER', 'mysql');
+        $host = core\EnvLoader::get('DB_HOST', 'localhost');
+        $port = core\EnvLoader::get('DB_PORT', $driver === 'pgsql' ? '5432' : '3306');
+        $dbname = core\EnvLoader::get('DB_NAME', '');
+        $user = core\EnvLoader::get('DB_USER', '');
+        $pass = core\EnvLoader::get('DB_PASS', '');
+        
+        // Build DSN based on driver
+        if ($driver === 'pgsql') {
+            $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;options='--client_encoding=UTF8'";
+        } else {
+            $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
+        }
+        
+        $connection = new PDO($dsn, $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ]);
+        
         $repository = new DatabaseRepository($connection, $dbConfig->getTablePrefix());
         
         if (!$repository->testConnection()) {
