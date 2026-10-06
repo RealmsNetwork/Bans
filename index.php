@@ -90,7 +90,7 @@ function showErrorPage(int $code, string $title, string $message, ?string $detai
             </div>
         </div>
     </div>
-    <div class="copyright-footer">Powered by <strong>LitebansU</strong> by <strong>Yamiru</strong></div>
+    <div class="copyright-footer">Built for RealmsNetwork by <strong>THEMPGUY</strong></div>
 </body>
 </html>
 HTML;
