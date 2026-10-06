@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?= htmlspecialchars($config['site_lang'] ?? $lang->getCurrentLanguage(), ENT_QUOTES, 'UTF-8') ?>">
+<html lang="<?= htmlspecialchars($lang->getCurrentLanguage(), ENT_QUOTES, 'UTF-8') ?>" dir="<?= $lang->getCurrentLanguage() === 'ar' ? 'rtl' : 'ltr' ?>">
 <head>
     <meta charset="<?= htmlspecialchars($config['site_charset'] ?? 'UTF-8', ENT_QUOTES, 'UTF-8') ?>">
     <meta name="viewport" content="<?= htmlspecialchars($config['site_viewport'] ?? 'width=device-width, initial-scale=1.0', ENT_QUOTES, 'UTF-8') ?>">
@@ -126,7 +126,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <meta name="distribution" content="global">
-    <meta name="language" content="<?= htmlspecialchars($config['site_lang'] ?? $lang->getCurrentLanguage(), ENT_QUOTES, 'UTF-8') ?>">
+    <meta name="language" content="<?= htmlspecialchars($lang->getCurrentLanguage(), ENT_QUOTES, 'UTF-8') ?>">
     <meta name="generator" content="Realms Bans">
     <meta name="coverage" content="Worldwide">
     <meta name="target" content="all">
