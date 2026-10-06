@@ -2,8 +2,8 @@
 
 return [
     'site' => [
-        'name' => 'LiteBans',
-        'title' => '{page} - LiteBans',
+        'name' => 'Realms Bans',
+        'title' => '{page} - Realms Bans',
         'description' => 'Δημόσια διεπαφή για την προβολή ποινών και αποκλεισμών του διακομιστή'
     ],
     
