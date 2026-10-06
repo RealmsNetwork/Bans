@@ -1,27 +1,25 @@
+<?php /* Realms Bans footer */ ?>
 </div>
 </main>
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Custom JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="<?= htmlspecialchars(asset('assets/js/main.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 
-<footer class="footer mt-auto">
+<footer class="footer">
     <div class="container">
-        <div class="row text-center text-md-start align-items-center py-3">
-            <!-- Left side -->
-            <div class="col-md-6 mb-2 mb-md-0">
-                <p class="mb-0">&#169; <?= htmlspecialchars($config['footer_site_name'], ENT_QUOTES, 'UTF-8') ?> <?= date('Y') ?></p>
+        <div class="footer-inner">
+            <div>
+                <strong><?= htmlspecialchars($config['footer_site_name'] ?: 'Realms Bans', ENT_QUOTES, 'UTF-8') ?></strong>
+                <span class="footer-muted">Public punishment history for RealmsNetwork.</span>
             </div>
-            <!-- Right side -->
-            <div class="col-md-6 text-md-end">
-                <p class="mb-0">
-                    Built for the RealmsNetwork Minecraft community by <a href="https://github.com/RealmsNetwork/Bans" target="_blank" rel="noopener noreferrer" class="text-decoration-none"><strong>THEMPGUY</strong></a> <span class="text-muted">·</span> <strong>Realms Bans</strong>
+            <div class="footer-meta">
+                <span>&#169; <?= date('Y') ?></span>
+                <span class="footer-dot">·</span>
+                <a href="https://github.com/RealmsNetwork/Bans" target="_blank" rel="noopener noreferrer">THEMPGUY / RealmsNetwork</a>
             </div>
         </div>
     </div>
 </footer>
-
 
 </body>
 </html>
