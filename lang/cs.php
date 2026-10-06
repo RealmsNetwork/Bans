@@ -2,8 +2,8 @@
 
 return [
     'site' => [
-        'name' => 'LiteBans',
-        'title' => '{page} - LiteBans',
+        'name' => 'Realms Bans',
+        'title' => '{page} - Realms Bans',
         'description' => 'Veřejné rozhraní pro zobrazování trestů a banů na serveru'
     ],
     
