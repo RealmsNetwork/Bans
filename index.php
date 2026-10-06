@@ -127,7 +127,7 @@ function parseDatabaseError(PDOException $e): array {
     }
     elseif ($code == 1146 || stripos($message, "doesn't exist") !== false || stripos($message, "does not exist") !== false) {
         $userMessage = 'Database table not found.';
-        $details = "Check TABLE_PREFIX in your .env file.\nMake sure LiteBans plugin has created the tables.\n\nOriginal error: {$message}";
+        $details = "Check TABLE_PREFIX in your .env file.\nMake sure configured punishment plugin has created the required tables.\n\nOriginal error: {$message}";
     }
     elseif ($code == 2006 || $code == 2013 || stripos($message, 'gone away') !== false || stripos($message, 'server closed the connection') !== false) {
         $userMessage = 'Database connection lost.';
