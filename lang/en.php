@@ -2,8 +2,8 @@
 
 return [
     'site' => [
-        'name' => 'LiteBans',
-        'title' => '{page} - LiteBans',
+        'name' => 'Realms Bans',
+        'title' => '{page} - Realms Bans',
         'description' => 'Public interface for viewing server punishments and bans'
     ],
     
@@ -21,8 +21,8 @@ return [
     ],
     
     'home' => [
-        'welcome' => 'Server Punishments',
-        'description' => 'Search for player punishments and view recent activity',
+        'welcome' => 'RealmsNetwork Punishments',
+        'description' => 'Search player punishment history, review moderation activity, and inspect public records',
         'recent_activity' => 'Recent Activity',
         'recent_bans' => 'Recent Bans',
         'recent_mutes' => 'Recent Mutes',
