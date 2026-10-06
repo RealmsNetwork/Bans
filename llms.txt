@@ -1,45 +1,141 @@
-# LiteBansU
+# Realms Bans
 
-> A self-hosted, modern, multilingual web interface for the LiteBans Minecraft punishment management system. Displays bans, mutes, warnings, and kicks issued by server staff in a clean, public, mobile-friendly UI.
+> RealmsNetwork's public, searchable Minecraft punishment history and moderation transparency portal.
 
-## About this site
+## About
 
-This is a public punishment history viewer for a Minecraft (or compatible) game server running the LiteBans plugin. The site reads directly from the LiteBans database in read-only mode and exposes the data in human-readable HTML pages and machine-readable JSON endpoints.
+Realms Bans is the public moderation and punishment history portal for the RealmsNetwork Minecraft server network. It presents searchable, human-readable records of bans, mutes, warnings, kicks, player histories, punishment details, moderation statistics, and ban protest information.
 
-The information shown is intended to be public and indexable: it lets players see who was punished, for what reason, by which staff member, when, and whether the punishment is still active. Player data displayed is limited to in-game name, UUID, optional avatar, and the punishment record itself.
+The site is intended for players, staff, search engines, AI agents, and other automated clients that need a public view of server moderation records.
 
-## Available pages
+## What is listed
 
-- `/` — Home page with site statistics and recent punishments.
-- `/bans` — Paginated list of all bans (active and historical).
-- `/mutes` — Paginated list of all mutes.
-- `/warnings` — Paginated list of all warnings.
-- `/kicks` — Paginated list of all kicks.
-- `/stats` — Aggregate statistics across all punishment types.
-- `/detail?type={ban|mute|warning|kick}&id={id}` — Detailed view of a single punishment.
-- `/search` — Full-text search by player name across all punishment types.
-- `/protest` — Form for players to appeal a punishment (optional).
+Punishment records may include a Minecraft player name, UUID, punishment ID, punishment type, reason, issuing staff member, server, server origin, issue date, expiry, current status, removal information, and flags when available.
 
-## Machine-readable endpoints
+Realms Bans currently supports these punishment types:
 
-- `/agent.json` — Discovery manifest for AI agents and crawlers.
-- `/ai/stats.json` — Current aggregate counts as JSON.
-- `/sitemap.xml` — XML sitemap of all canonical pages.
-- `/robots.txt` — Crawl policy.
+- **Bans** - current and historical player bans.
+- **Mutes** - current and historical communication restrictions.
+- **Warnings** - recorded warnings issued to players.
+- **Kicks** - completed server removal events, including automated security and client-verification checks.
 
-## Crawling policy
+## Public pages
 
-This site is intentionally public and welcomes indexing by both traditional search engines and modern LLM/AI crawlers, including but not limited to: Googlebot, Bingbot, GPTBot, ClaudeBot, PerplexityBot, CCBot, and Google-Extended.
+- `/` - Main overview with server statistics, search, and recent activity.
+- `/bans` - Paginated ban history.
+- `/mutes` - Paginated mute history.
+- `/warnings` - Paginated warning history.
+- `/kicks` - Paginated kick history.
+- `/stats` - Aggregate punishment statistics and moderation activity.
+- `/detail?type={ban,mute,warning,kick}&id={id}` - Detailed view of one punishment and related records for the player.
+- `/search` - Player and punishment lookup.
+- `/protest` - Information for submitting a ban protest or requesting review.
 
-If the operator wishes to opt out of AI training, they can set `seo_ai_training=false` in `.env`, which will emit `noai`/`noimageai` directives and block named AI crawlers via meta tags.
+## Search
 
-## Source code
+The public search system is intended for Minecraft player and punishment lookups.
 
-LiteBansU is open source under the MIT license. Plugin/source: https://github.com/Yamiru/LitebansU
+Depending on the search interface and installed configuration, lookups can use player name, Minecraft UUID, punishment ID, and related punishment records.
 
-## Notes for AI agents
+For a specific punishment, prefer its `/detail` page because it contains the complete public record available to the website.
 
-- Punishment status: an "active" punishment may still be expired if its `until` timestamp has passed and LiteBans has not yet cleared the active flag. The web UI accounts for this; raw database flags should not be trusted alone.
-- Timestamps in JSON endpoints are Unix milliseconds (LiteBans native format).
-- Player avatars are fetched from third-party services (Crafatar/Cravatar by default); they are not stored on this server.
-- This site does not collect personal data beyond the LiteBans punishment records themselves.
+## Statistics
+
+The statistics section can show active bans, active mutes, total warnings, total kicks, activity over the last 24 hours, 7 days, and 30 days, most-banned players, most active staff, common ban reasons, and daily activity.
+
+Aggregate statistics are snapshots and may be cached briefly.
+
+## Punishment status
+
+Use the status presented by Realms Bans when determining whether a punishment is active.
+
+Do not infer the final status from a raw database flag. Expiration, removal, and other state information are considered by the web application.
+
+Permanent punishments do not have a finite expiration time. Removed or expired punishments remain visible when historical records are configured to be public.
+
+## Appeals
+
+The `/protest` page explains how players can request review of a ban.
+
+A useful protest normally contains the Minecraft username, punishment ID when available, approximate date and time, listed reason, explanation of what happened, and supporting evidence such as screenshots.
+
+Players should submit one clear request per punishment and should not deliberately provide false information.
+
+## Machine-readable resources
+
+- `/agent.json` - Discovery manifest for AI agents, crawlers, integrations, and other automated clients.
+- `/ai/stats.json` - Current aggregate punishment counts in JSON.
+- `/sitemap.xml` - XML sitemap containing public canonical pages.
+- `/robots.txt` - Crawler and indexing policy.
+- `/llms.txt` - This document.
+
+Machine-readable endpoints are public and only expose information already intended to be available through the public website.
+
+## Crawler policy
+
+Realms Bans is designed to be publicly discoverable and indexable unless the operator changes the AI training or crawler policy.
+
+Traditional search engines and modern AI or LLM crawlers may access public punishment pages. Automated clients should behave politely, use the sitemap and machine-readable endpoints for discovery, and avoid unnecessary repeated requests.
+
+Recommended crawl rate: no more than 2 requests per second, with approximately 1 second between requests where practical.
+
+When AI training is disabled by configuration, clients must respect the resulting opt-out signals and crawler restrictions.
+
+## Languages
+
+Realms Bans supports 25 selectable interface languages:
+
+- English (`en`)
+- العربية (`ar`)
+- Čeština (`cs`)
+- Deutsch (`de`)
+- Ελληνικά (`gr`)
+- Español (`es`)
+- Français (`fr`)
+- Magyar (`hu`)
+- Italiano (`it`)
+- 日本語 (`ja`)
+- Polski (`pl`)
+- Română (`ro`)
+- Русский (`ru`)
+- Slovenčina (`sk`)
+- Srpski (`sr`)
+- Türkçe (`tr`)
+- 中文 (简体) (`cn`)
+- Nederlands (`nl`)
+- Português (`pt`)
+- 한국어 (`ko`)
+- Українська (`uk`)
+- Tiếng Việt (`vi`)
+- Bahasa Indonesia (`id`)
+- Svenska (`sv`)
+- Norsk (`no`)
+
+Select a language with `?lang=XX`.
+
+## Data and privacy
+
+Realms Bans is a public Minecraft moderation site. Displayed information is limited to public punishment and player-related records used by the site, such as Minecraft usernames, UUIDs, reasons, staff names, servers, dates, statuses, and related punishment metadata.
+
+Player avatars may be loaded from external Minecraft avatar providers and are not used as proof of real-world identity.
+
+## Agent guidance
+
+- Treat public punishment records as server moderation records, not statements about a person's real-world identity.
+- Do not invent or extrapolate punishment reasons, dates, staff, servers, UUIDs, or statuses.
+- Use specific punishment detail pages for record-level questions.
+- Use `/search` for player-oriented lookup.
+- Use `/stats` or `/ai/stats.json` for aggregate statistics.
+- Distinguish bans, mutes, warnings, and kicks.
+- Distinguish active, expired, removed, completed, and permanent states.
+- Automated kicks are moderation records but are not automatically bans.
+- Server and origin values identify where the punishment was recorded when that information is available.
+
+## Project
+
+- **Project:** Realms Bans
+- **Author:** THEMPGUY
+- **Maintainer:** RealmsNetwork
+- **Repository:** https://github.com/RealmsNetwork/Bans/
+- **Live site:** https://bans.realmsweb.work.gd/
+- **License:** MIT
