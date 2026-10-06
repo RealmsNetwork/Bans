@@ -37,15 +37,14 @@ class AiController extends BaseController
         $manifest = [
             'schema_version' => '1.0',
             'name' => $this->config['site_name'] ?? 'Realms Bans',
-            'description' => $this->config['site_description'] ?? 'Public punishment history for a LiteBans-powered game server.',
+            'description' => $this->config['site_description'] ?? 'Public, searchable punishment history for RealmsNetwork Minecraft servers.',
             'version' => $version,
             'product' => 'Realms Bans',
             'project' => 'Realms Bans',
             'author' => 'THEMPGUY',
             'maintainer' => 'RealmsNetwork',
             'repository' => 'https://github.com/RealmsNetwork/Bans',
-            'product_url' => 'https://github.com/THEMPGUY/LitebansU',
-            'product_license' => 'MIT',
+            'license' => 'MIT',
             'base_url' => $siteUrl,
             'canonical_url' => $siteUrl,
             'human_readable' => [
@@ -91,9 +90,11 @@ class AiController extends BaseController
                 'switch_param' => 'lang',
             ],
             'contact' => [
-                'maintainer' => 'THEMPGUY',
-                'homepage' => 'https://yamiru.com',
-                'issues' => 'https://github.com/THEMPGUY/LitebansU/issues',
+                'maintainer' => 'RealmsNetwork',
+                'author' => 'THEMPGUY',
+                'homepage' => 'https://bans.realmsweb.work.gd/',
+                'repository' => 'https://github.com/RealmsNetwork/Bans',
+                'issues' => 'https://github.com/RealmsNetwork/Bans/issues',
             ],
             'generated_at' => gmdate('c'),
         ];
