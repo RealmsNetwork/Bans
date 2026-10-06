@@ -5,10 +5,10 @@
  * ============================================================================
  *
  *  Plugin Name:   Realms Bans
- *  Description:   A modern, secure, and responsive web interface for LiteBans punishment management system.
+ *  Description:   Public, searchable punishment history and moderation portal for RealmsNetwork.
  *  Version:       3.7
- *  Market URI:    https://builtbybit.com/resources/litebansu-litebans-website.69448/
- *  Author URI:    https://yamiru.com
+ *  Repository:    https://github.com/RealmsNetwork/Bans/
+ *  Author URI:    https://github.com/RealmsNetwork/Bans/
  *  License:       MIT
  *  License URI:   https://opensource.org/licenses/MIT
  * ============================================================================
