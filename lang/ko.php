@@ -1,0 +1,17 @@
+<?php
+return [
+ 'site'=>['name'=>'Realms Bans','title'=>'{page} - Realms Bans','description'=>'RealmsNetwork Minecraft 서버의 공개 처벌 및 제재 기록'],
+ 'nav'=>['home'=>'홈','bans'=>'밴','mutes'=>'뮤트','warnings'=>'경고','kicks'=>'킥','statistics'=>'통계','language'=>'언어','theme'=>'테마','admin'=>'관리','protest'=>'밴 이의제기'],
+ 'home'=>['welcome'=>'서버 처벌 기록','description'=>'플레이어를 검색하고 최근 관리 활동을 확인하세요','recent_activity'=>'최근 활동','recent_bans'=>'최근 밴','recent_mutes'=>'최근 뮤트','no_recent_bans'=>'최근 밴이 없습니다','no_recent_mutes'=>'최근 뮤트가 없습니다','view_all_bans'=>'모든 밴 보기','view_all_mutes'=>'모든 뮤트 보기'],
+ 'search'=>['title'=>'플레이어 검색','placeholder'=>'플레이어 이름 또는 UUID 입력...','help'=>'플레이어 이름 또는 전체 UUID로 검색할 수 있습니다','button'=>'검색','no_results'=>'해당 플레이어의 처벌 기록이 없습니다','error'=>'검색 오류가 발생했습니다','network_error'=>'네트워크 오류입니다. 다시 시도해 주세요.'],
+ 'stats'=>['title'=>'서버 통계','active_bans'=>'활성 밴','active_mutes'=>'활성 뮤트','total_warnings'=>'전체 경고','total_kicks'=>'전체 킥','total_of'=>'총','all_time'=>'전체 기간','most_banned_players'=>'가장 많이 밴된 플레이어','most_active_staff'=>'가장 활발한 스태프','top_ban_reasons'=>'가장 많은 밴 사유','recent_activity_overview'=>'최근 활동 개요','activity_by_day'=>'일별 활동','cache_cleared'=>'통계 캐시를 삭제했습니다','cache_clear_failed'=>'통계 캐시를 삭제하지 못했습니다','clear_cache'=>'캐시 삭제','last_24h'=>'최근 24시간','last_7d'=>'최근 7일','last_30d'=>'최근 30일'],
+ 'table'=>['player'=>'플레이어','reason'=>'사유','staff'=>'스태프','date'=>'날짜','expires'=>'만료','status'=>'상태','actions'=>'작업','type'=>'유형','view'=>'보기','total'=>'전체','active'=>'활성','last_ban'=>'최근 밴','last_action'=>'최근 작업','server'=>'서버'],
+ 'status'=>['active'=>'활성','inactive'=>'비활성','expired'=>'만료','removed'=>'삭제됨','completed'=>'완료됨','removed_by'=>'삭제한 사람'],
+ 'punishment'=>['permanent'=>'영구','expired'=>'만료됨'],
+ 'punishments'=>['no_data'=>'처벌 기록이 없습니다','no_data_desc'=>'현재 표시할 처벌 기록이 없습니다'],
+ 'detail'=>['duration'=>'기간','time_left'=>'남은 시간','progress'=>'진행률','removed_by'=>'삭제한 사람','removed_date'=>'삭제 날짜','flags'=>'플래그','other_punishments'=>'다른 처벌'],
+ 'pagination'=>['label'=>'페이지 탐색','previous'=>'이전','next'=>'다음','page_info'=>'{current} / {total} 페이지'],
+ 'footer'=>['rights'=>'모든 권리 보유.','powered_by'=>'Powered by','license'=>'라이선스'],
+ 'error'=>['not_found'=>'페이지를 찾을 수 없습니다','server_error'=>'서버 오류가 발생했습니다','invalid_request'=>'잘못된 요청입니다','punishment_not_found'=>'요청한 처벌 기록을 찾을 수 없습니다.','loading_failed'=>'처벌 정보를 불러오지 못했습니다.'],
+ 'protest'=>['title'=>'밴 이의제기','description'=>'밴이 잘못 적용되었다고 생각한다면 검토를 요청할 수 있습니다.','how_to_title'=>'밴 이의제기 방법','how_to_subtitle'=>'검토 요청을 위해 다음 단계를 따라주세요:','step1_title'=>'1. 정보 준비','step1_desc'=>'다음 정보를 준비하세요:','step1_items'=>['Minecraft 사용자 이름','밴 날짜와 시간','표시된 밴 사유','사례를 뒷받침하는 증거'],'step2_title'=>'2. 연락 방법','step2_desc'=>'다음 방법 중 하나로 이의를 제기할 수 있습니다:','discord_title'=>'Discord (권장)','discord_desc'=>'Discord에 참여하여 이의제기 티켓을 생성하세요','discord_button'=>'Discord 열기','email_title'=>'이메일','email_desc'=>'이의제기를 다음 주소로 보내세요:','forum_title'=>'포럼','forum_desc'=>'포럼의 이의제기 섹션에 게시물을 작성하세요.','forum_button'=>'포럼 열기','step3_title'=>'3. 포함할 내용','step3_desc'=>'사용자 이름, 상황, 이의제기 이유와 원하는 조치를 작성하세요.','step3_items'=>['Minecraft 사용자 이름','밴 날짜와 대략적인 시간','밴을 적용한 스태프 (알고 있다면)','밴이 부당하다고 생각하는 이유','스크린샷 또는 증거','상황에 대한 솔직한 설명'],'step4_title'=>'4. 검토 대기','step4_desc'=>'스태프 팀이 검토합니다. 같은 밴에 대해 여러 번 제출하지 마세요.','guidelines_title'=>'중요 안내','guidelines_items'=>['정직하고 예의 있게 작성하세요','허위 정보를 제출하지 마세요','반복 제출로 스팸하지 마세요','최종 결정을 존중하세요','밴 우회는 영구 밴으로 이어질 수 있습니다'],'warning_title'=>'주의','warning_desc'=>'허위 정보 또는 기만적인 행동은 이의제기 거절 및 추가 처벌로 이어질 수 있습니다.','form_not_available'=>'현재 직접 이의제기 제출은 사용할 수 없습니다. 위의 연락 방법을 이용하세요.']
+];
