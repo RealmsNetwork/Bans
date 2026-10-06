@@ -1,10 +1,10 @@
 <?php
 /**
  * ============================================================================
- *  LiteBansU
+ *  Realms Bans
  * ============================================================================
  *
- *  Plugin Name:   LiteBansU
+ *  Plugin Name:   Realms Bans
  *  Description:   Machine-readable endpoints for AI agents, crawlers, and integrations.
  *  Version:       3.9
  *  Market URI:    https://builtbybit.com/resources/litebansu-litebans-website.69448/
@@ -36,11 +36,15 @@ class AiController extends BaseController
         
         $manifest = [
             'schema_version' => '1.0',
-            'name' => $this->config['site_name'] ?? 'LiteBansU',
+            'name' => $this->config['site_name'] ?? 'Realms Bans',
             'description' => $this->config['site_description'] ?? 'Public punishment history for a LiteBans-powered game server.',
             'version' => $version,
-            'product' => 'LiteBansU',
-            'product_url' => 'https://github.com/Yamiru/LitebansU',
+            'product' => 'Realms Bans',
+            'project' => 'Realms Bans',
+            'author' => 'THEMPGUY',
+            'maintainer' => 'RealmsNetwork',
+            'repository' => 'https://github.com/RealmsNetwork/Bans',
+            'product_url' => 'https://github.com/THEMPGUY/LitebansU',
             'product_license' => 'MIT',
             'base_url' => $siteUrl,
             'canonical_url' => $siteUrl,
@@ -87,9 +91,9 @@ class AiController extends BaseController
                 'switch_param' => 'lang',
             ],
             'contact' => [
-                'maintainer' => 'Yamiru',
+                'maintainer' => 'THEMPGUY',
                 'homepage' => 'https://yamiru.com',
-                'issues' => 'https://github.com/Yamiru/LitebansU/issues',
+                'issues' => 'https://github.com/THEMPGUY/LitebansU/issues',
             ],
             'generated_at' => gmdate('c'),
         ];
@@ -115,10 +119,14 @@ class AiController extends BaseController
         
         $payload = [
             'schema_version' => '1.0',
-            'product' => 'LiteBansU',
+            'product' => 'Realms Bans',
+            'project' => 'Realms Bans',
+            'author' => 'THEMPGUY',
+            'maintainer' => 'RealmsNetwork',
+            'repository' => 'https://github.com/RealmsNetwork/Bans',
             'product_version' => $version,
             'site' => [
-                'name' => $this->config['site_name'] ?? 'LiteBansU',
+                'name' => $this->config['site_name'] ?? 'Realms Bans',
                 'url' => $siteUrl,
             ],
             'generated_at' => gmdate('c'),
@@ -246,7 +254,7 @@ class AiController extends BaseController
         $aiOptOut = isset($this->config['seo_ai_training']) && $this->config['seo_ai_training'] === false;
         
         $lines = [];
-        $lines[] = '# robots.txt for ' . ($this->config['site_name'] ?? 'LiteBansU');
+        $lines[] = '# robots.txt for ' . ($this->config['site_name'] ?? 'Realms Bans');
         $lines[] = '# Dynamically generated. Auto-detects deployment URL and AI opt-in/opt-out.';
         $lines[] = '';
         $lines[] = '# ---------------------------------------------------------------------------';
@@ -334,64 +342,112 @@ class AiController extends BaseController
     public function llms(): void
     {
         $siteUrl = $this->resolveSiteUrl();
-        $siteName = $this->config['site_name'] ?? 'LiteBansU';
-        $siteDesc = $this->config['site_description'] ?? 'A self-hosted, multilingual web interface for the LiteBans Minecraft punishment management system.';
+        $siteName = $this->config['site_name'] ?? 'Realms Bans';
+        $siteDesc = $this->config['site_description'] ?? 'Public, searchable punishment history for RealmsNetwork Minecraft servers.';
         $supported = implode(', ', $this->lang->getSupportedLanguages());
         $aiOptOut = isset($this->config['seo_ai_training']) && $this->config['seo_ai_training'] === false;
         $policyLine = $aiOptOut
-            ? 'The operator has opted out of AI training. AI/LLM crawlers will see noindex/nofollow signals; please respect that opt-out.'
-            : 'This site is intentionally public and welcomes indexing by both traditional search engines and modern LLM/AI crawlers (Googlebot, Bingbot, GPTBot, ClaudeBot, PerplexityBot, CCBot, Google-Extended, and others).';
+            ? 'The operator has disabled AI training. Respect the configured crawler opt-out and do not use the site for training.'
+            : 'Public punishment pages are intended to be discoverable by search engines, AI agents, and other automated clients.';
         
         $body = <<<TXT
 # {$siteName}
 
 > {$siteDesc}
 
-## About this site
+## About
 
-This is a public punishment history viewer for a Minecraft (or compatible) game server running the LiteBans plugin. The site reads directly from the LiteBans database in read-only mode and exposes the data in human-readable HTML pages and machine-readable JSON endpoints.
+Realms Bans is RealmsNetwork's public moderation and punishment history portal for its Minecraft server network. It provides searchable, human-readable records of bans, mutes, warnings, kicks, punishment details, player history, moderation statistics, and ban protest information.
 
-The information shown is intended to be public and indexable: it lets players see who was punished, for what reason, by which staff member, when, and whether the punishment is still active. Player data displayed is limited to in-game name, UUID, optional avatar, and the punishment record itself.
+The site is designed for players, staff, search engines, AI agents, and other clients that need a reliable public view of Minecraft moderation records.
 
-## Available pages
+## Public pages
 
-- {$siteUrl}/ - Home page with site statistics and recent punishments.
-- {$siteUrl}/bans - Paginated list of all bans (active and historical).
-- {$siteUrl}/mutes - Paginated list of all mutes.
-- {$siteUrl}/warnings - Paginated list of all warnings.
-- {$siteUrl}/kicks - Paginated list of all kicks.
-- {$siteUrl}/stats - Aggregate statistics across all punishment types.
-- {$siteUrl}/detail?type={ban|mute|warning|kick}&id={id} - Detailed view of a single punishment.
-- {$siteUrl}/search - Full-text search by player name across all punishment types.
-- {$siteUrl}/protest - Form for players to appeal a punishment (optional).
+- {$siteUrl}/ - Overview, current statistics, search, and recent punishment activity.
+- {$siteUrl}/bans - Searchable/paginated ban history, including active, expired, and removed bans.
+- {$siteUrl}/mutes - Searchable/paginated mute history and current mutes.
+- {$siteUrl}/warnings - Searchable/paginated warning history.
+- {$siteUrl}/kicks - Searchable/paginated kick history, including automated moderation/security kicks.
+- {$siteUrl}/stats - Punishment totals, recent activity windows, active staff, common ban reasons, and activity breakdowns.
+- {$siteUrl}/detail?type={ban|mute|warning|kick}&id={id} - Full details for one punishment and related punishments for the same player.
+- {$siteUrl}/search - Player and punishment lookup.
+- {$siteUrl}/protest - Instructions for requesting review of a ban.
 
-## Machine-readable endpoints
+## Search and lookup
 
-- {$siteUrl}/agent.json - Discovery manifest for AI agents and crawlers.
-- {$siteUrl}/ai/stats.json - Current aggregate counts as JSON (60s cache).
-- {$siteUrl}/sitemap.xml - XML sitemap of all canonical pages.
-- {$siteUrl}/robots.txt - Crawl policy.
+The public search system is intended for Minecraft player and punishment research. Searches may be performed by player name, UUID, or punishment ID depending on the available search interface.
+
+Use individual punishment detail pages for authoritative information about a specific record. A player's related punishments may also appear on the detail page.
+
+## Punishment types
+
+Realms Bans exposes four punishment categories:
+
+- Ban - prevents a player from accessing a server when active.
+- Mute - restricts chat or communication when active.
+- Warning - records a warning issued to a player.
+- Kick - records a completed server removal event, including automated security or client verification kicks.
+
+Punishment records can include player name, UUID, punishment ID, reason, staff member, server, origin, issue time, expiry, status, removal information, and flags when present.
+
+## Status interpretation
+
+Always use the status calculated and displayed by Realms Bans. Do not infer current status from a raw database flag alone.
+
+Permanent punishments have no finite expiration time. Removed punishments remain part of historical records and are distinguishable from currently active punishments.
+
+## Statistics
+
+The statistics area provides aggregate counts and recent activity across punishment types. It may include 24-hour, 7-day, and 30-day activity, most active staff, most-banned players, and common ban reasons.
+
+The machine-readable statistics endpoint is cached for a short period and should be treated as a snapshot rather than a live transaction feed.
+
+## Appeals
+
+The /protest page explains how players can request a ban review. Appeals should include the relevant Minecraft username, punishment ID, approximate date/time, reason, explanation, and supporting evidence when available.
+
+Submitting multiple or deliberately misleading appeals is discouraged. The final decision remains with the RealmsNetwork staff team.
+
+## Machine-readable resources
+
+- {$siteUrl}/agent.json - Machine-readable site and capability manifest.
+- {$siteUrl}/ai/stats.json - Aggregate punishment statistics in JSON.
+- {$siteUrl}/sitemap.xml - Search-engine sitemap of public canonical pages.
+- {$siteUrl}/robots.txt - Crawler policy.
+- {$siteUrl}/llms.txt - This document.
+
+## Agent guidance
+
+- Prefer specific detail pages for answering questions about one punishment.
+- Prefer /search for player-oriented lookups.
+- Prefer /stats or /ai/stats.json for aggregate counts.
+- Preserve the distinction between active, expired, removed, completed, and permanent records.
+- Do not invent punishment reasons, staff members, dates, servers, or player information that is not present on the site.
+- Treat automated kicks as moderation records, not necessarily as bans.
+- Server names such as "ch", "g-1", "cs-1", or "RealmsNetwork" identify the recorded server/origin when present.
+- Player avatars may be supplied by an external avatar provider and are not evidence of identity beyond the in-game account shown.
+- Public punishment data should be interpreted as a record of the server's moderation system, not as an independent claim about a player's real-world identity.
 
 ## Crawling policy
 
 {$policyLine}
 
+Recommended behavior for automated clients is no more than 2 requests per second and a crawl delay of about 1 second.
+
 ## Supported languages
 
 {$supported}
 
-Language switch parameter: ?lang=XX
+Language selection uses the ?lang=XX parameter.
 
-## Source code
+## Project information
 
-LiteBansU is open source under the MIT license. Plugin/source: https://github.com/Yamiru/LitebansU
-
-## Notes for AI agents
-
-- Punishment status: an "active" punishment may still be expired if its `until` timestamp has passed and LiteBans has not yet cleared the active flag. The web UI accounts for this; raw database flags should not be trusted alone.
-- Timestamps in JSON endpoints are Unix milliseconds (LiteBans native format).
-- Player avatars are fetched from third-party services (Crafatar/Cravatar by default); they are not stored on this server.
-- This site does not collect personal data beyond the LiteBans punishment records themselves.
+- Project: Realms Bans
+- Author: THEMPGUY
+- Maintainer: RealmsNetwork
+- Repository: https://github.com/RealmsNetwork/Bans
+- License: MIT
+- Live site: {$siteUrl}
 
 TXT;
         
