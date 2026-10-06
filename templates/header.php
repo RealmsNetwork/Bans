@@ -120,14 +120,14 @@
     <?php if (isset($config['site_keywords']) && !empty($config['site_keywords'])): ?>
     <meta name="keywords" content="<?= htmlspecialchars($config['site_keywords'], ENT_QUOTES, 'UTF-8') ?>">
     <?php endif; ?>
-    <meta name="author" content="<?= htmlspecialchars($config['seo_organization_name'] ?? $config['site_name'], ENT_QUOTES, 'UTF-8') ?>">
+    <meta name="author" content="<?= htmlspecialchars($config['site_author'] ?? $config['seo_organization_name'] ?? $config['site_name'], ENT_QUOTES, 'UTF-8') ?>">
     <meta name="rating" content="general">
     <meta name="revisit-after" content="7 days">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <meta name="distribution" content="global">
     <meta name="language" content="<?= htmlspecialchars($config['site_lang'] ?? $lang->getCurrentLanguage(), ENT_QUOTES, 'UTF-8') ?>">
-    <meta name="generator" content="Realms Bans 3.0">
+    <meta name="generator" content="Realms Bans">
     <meta name="coverage" content="Worldwide">
     <meta name="target" content="all">
     <meta name="HandheldFriendly" content="True">
@@ -386,33 +386,11 @@
                         <button class="btn btn-sm btn-navbar dropdown-toggle" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <?php
                             $currentLang = $lang->getCurrentLanguage();
-                            $langNames = [
-                                'ar' => 'AR',
-                                'cs' => 'CS',
-                                'de' => 'DE',
-                                'gr' => 'GR',
-                                'en' => 'EN',
-                                'es' => 'ES',
-                                'fr' => 'FR',
-                                'hu' => 'HU',
-                                'it' => 'IT',
-                                'ja' => 'JA',
-                                'pl' => 'PL',
-                                'ro' => 'RO',
-                                'ru' => 'RU',
-                                'sk' => 'SK',
-                                'sr' => 'SR',
-                                'tr' => 'TR',
-                                'cn' => 'CN',
-                                'nl' => 'NL',
-                                'pt' => 'PT',
-                                'ko' => 'KO',
-                                'uk' => 'UK',
-                                'vi' => 'VI',
-                                'id' => 'ID',
-                                'sv' => 'SV',
-                                'no' => 'NO',
-                            ];
+                            $langNames = [];
+                            foreach ($lang->getSupportedLanguages() as $supportedCode) {
+                                $langNames[$supportedCode] = strtoupper($supportedCode);
+                            }
+
                             ?>
                             <i class="fas fa-globe"></i>
                             <span><?= htmlspecialchars($langNames[$currentLang] ?? 'EN', ENT_QUOTES, 'UTF-8') ?></span>
