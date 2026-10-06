@@ -1,10 +1,10 @@
 <?php
 /**
  * ============================================================================
- *  LiteBansU
+ *  Realms Bans
  * ============================================================================
  *
- *  Plugin Name:   LiteBansU
+ *  Plugin Name:   Realms Bans
  *  Description:   A modern, secure, and responsive web interface for LiteBans punishment management system.
  *  Version:       3.7
  *  Market URI:    https://builtbybit.com/resources/litebansu-litebans-website.69448/
@@ -25,8 +25,8 @@ use core\EnvLoader;
 
 return [
     // Site Configuration
-    'site_name' => EnvLoader::get('SITE_NAME', 'LiteBansU'),
-    'footer_site_name' => EnvLoader::get('FOOTER_SITE_NAME', 'YourSite'),
+    'site_name' => EnvLoader::get('SITE_NAME', 'Realms Bans'),
+    'footer_site_name' => EnvLoader::get('FOOTER_SITE_NAME', 'Realms Bans'),
     'items_per_page' => (int)EnvLoader::get('ITEMS_PER_PAGE', 20),
     'timezone' => EnvLoader::get('TIMEZONE', 'UTC'),
     'date_format' => EnvLoader::get('DATE_FORMAT', 'Y-m-d H:i:s'),
@@ -71,15 +71,15 @@ return [
     'site_charset' => EnvLoader::get('SITE_CHARSET', 'UTF-8'),
     'site_viewport' => EnvLoader::get('SITE_VIEWPORT', 'width=device-width, initial-scale=1.0'),
     'site_robots' => EnvLoader::get('SITE_ROBOTS', 'index, follow'),
-    'site_description' => EnvLoader::get('SITE_DESCRIPTION', 'Public interface for viewing server punishments and bans'),
+    'site_description' => EnvLoader::get('SITE_DESCRIPTION', 'Public, searchable punishment history for RealmsNetwork Minecraft servers'),
     'site_title_template' => EnvLoader::get('SITE_TITLE_TEMPLATE', '{page} - {site}'),
     'site_favicon' => EnvLoader::get('SITE_FAVICON', 'favicon.ico'),
     'site_apple_icon' => EnvLoader::get('SITE_APPLE_ICON', 'apple-touch-icon.png'),
-    'site_theme_color' => EnvLoader::get('SITE_THEME_COLOR', '#ef4444'),
+    'site_theme_color' => EnvLoader::get('SITE_THEME_COLOR', '#8b5cf6'),
     'site_og_image' => EnvLoader::get('SITE_OG_IMAGE'),
     'site_twitter_site' => EnvLoader::get('SITE_TWITTER_SITE'),
     'site_keywords' => EnvLoader::get('SITE_KEYWORDS'),
-    'site_author' => EnvLoader::get('SITE_AUTHOR'),
+    'site_author' => EnvLoader::get('SITE_AUTHOR', 'THEMPGUY'),
     'site_generator' => EnvLoader::get('SITE_GENERATOR', 'LitebansU'),
     
     // Security Configuration
@@ -102,7 +102,7 @@ return [
     
     // SEO Advanced Configuration (v2.7)
     'seo_enable_schema' => EnvLoader::get('SEO_ENABLE_SCHEMA', 'true') === 'true',
-    'seo_organization_name' => EnvLoader::get('SEO_ORGANIZATION_NAME'),
+    'seo_organization_name' => EnvLoader::get('SEO_ORGANIZATION_NAME', 'RealmsNetwork'),
     'seo_organization_logo' => EnvLoader::get('SEO_ORGANIZATION_LOGO'),
     'seo_social_facebook' => EnvLoader::get('SEO_SOCIAL_FACEBOOK'),
     'seo_social_twitter' => EnvLoader::get('SEO_SOCIAL_TWITTER'),
