@@ -80,7 +80,7 @@ return [
     'site_twitter_site' => EnvLoader::get('SITE_TWITTER_SITE'),
     'site_keywords' => EnvLoader::get('SITE_KEYWORDS'),
     'site_author' => EnvLoader::get('SITE_AUTHOR', 'THEMPGUY'),
-    'site_generator' => EnvLoader::get('SITE_GENERATOR', 'LitebansU'),
+    'site_generator' => EnvLoader::get('SITE_GENERATOR', 'Realms Bans'),
     
     // Security Configuration
     'session_lifetime' => (int)EnvLoader::get('SESSION_LIFETIME', 3600),
