@@ -1,10 +1,10 @@
 <?php
 /**
  * ============================================================================
- *  LiteBansU
+ *  Realms Bans
  * ============================================================================
  *
- *  Plugin Name:   LiteBansU
+ *  Plugin Name:   Realms Bans
  *  Description:   A modern, secure, and responsive web interface for LiteBans punishment management system.
  *  Version:       3.9
  *  Market URI:    https://builtbybit.com/resources/litebansu-litebans-website.69448/
@@ -304,7 +304,7 @@ try {
     // Language switch
     if (isset($_GET['lang'])) {
         $selectedLang = preg_replace('/[^a-z]/', '', substr($_GET['lang'], 0, 2));
-        if (in_array($selectedLang, ['ar', 'cs', 'de', 'gr', 'en', 'es', 'fr', 'hu', 'it', 'ja', 'pl', 'ro', 'ru', 'sk', 'sr', 'tr', 'cn'])) {
+        if (in_array($selectedLang, ['ar', 'cs', 'de', 'gr', 'en', 'es', 'fr', 'hu', 'it', 'ja', 'pl', 'ro', 'ru', 'sk', 'sr', 'tr', 'cn', 'nl', 'pt', 'ko', 'uk', 'vi', 'id', 'sv', 'no'])) {
             $_SESSION['selected_lang'] = $selectedLang;
             setcookie('selected_lang', $selectedLang, [
                 'expires' => time() + 86400 * 30,
