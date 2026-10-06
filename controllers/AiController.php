@@ -484,7 +484,7 @@ TXT;
      * Resolve the canonical base URL of this deployment.
      *
      * Priority:
-     *   1. $config['site_url'] (operator-defined absolute URL, including any subdir like /litebansU)
+     *   1. $config['site_url'] (operator-defined absolute URL, including any subdirectory)
      *   2. Scheme + host + BASE_PATH (auto-detected from the current request)
      *
      * This makes the AI/SEO endpoints work on any hosting layout - root domain,
