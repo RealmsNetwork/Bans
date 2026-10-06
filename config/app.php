@@ -66,7 +66,7 @@ return [
     'protest_forum' => EnvLoader::get('PROTEST_FORUM', '#'),
     
     // SEO Configuration
-    'site_url' => EnvLoader::get('SITE_URL', 'https://'),
+    'site_url' => EnvLoader::get('SITE_URL', 'https://bans.realmsweb.work.gd'),
     'site_lang' => EnvLoader::get('SITE_LANG', 'en'),
     'site_charset' => EnvLoader::get('SITE_CHARSET', 'UTF-8'),
     'site_viewport' => EnvLoader::get('SITE_VIEWPORT', 'width=device-width, initial-scale=1.0'),
