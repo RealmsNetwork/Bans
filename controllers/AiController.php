@@ -56,6 +56,15 @@ class AiController extends BaseController
                 'stats' => $siteUrl . '/stats',
                 'search' => $siteUrl . '/search',
             ],
+            'capabilities' => [
+                'public_search' => true,
+                'player_lookup' => true,
+                'punishment_lookup' => true,
+                'punishment_types' => ['ban', 'mute', 'warning', 'kick'],
+                'aggregate_statistics' => true,
+                'individual_detail_pages' => true,
+                'appeal_information' => true,
+            ],
             'machine_readable' => [
                 'stats_json' => $siteUrl . '/ai/stats.json',
                 'sitemap_xml' => $siteUrl . '/sitemap.xml',
