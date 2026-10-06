@@ -19,7 +19,7 @@ declare(strict_types=1);
 class LanguageManager
 {
     private const DEFAULT_LANG = 'en';
-    private const SUPPORTED_LANGS = ['en', 'ar', 'cs', 'de', 'gr', 'es', 'fr', 'hu', 'it', 'ja', 'pl', 'ro', 'ru', 'sk', 'sr', 'tr', 'cn'];
+    private const SUPPORTED_LANGS = ['en', 'ar', 'cs', 'de', 'gr', 'es', 'fr', 'hu', 'it', 'ja', 'pl', 'ro', 'ru', 'sk', 'sr', 'tr', 'cn', 'nl', 'pt', 'ko', 'uk', 'vi', 'id', 'sv', 'no'];
     
     private array $translations = [];
     private string $currentLang;
@@ -126,6 +126,14 @@ class LanguageManager
             'sr' => 'Srpski',
             'tr' => 'Türkçe',
             'cn' => '中文 (简体)',
+            'nl' => 'Nederlands',
+            'pt' => 'Português',
+            'ko' => '한국어',
+            'uk' => 'Українська',
+            'vi' => 'Tiếng Việt',
+            'id' => 'Bahasa Indonesia',
+            'sv' => 'Svenska',
+            'no' => 'Norsk',
         ];
         
         return $names[$code] ?? strtoupper($code);
