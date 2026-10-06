@@ -127,7 +127,7 @@
 
     <meta name="distribution" content="global">
     <meta name="language" content="<?= htmlspecialchars($config['site_lang'] ?? $lang->getCurrentLanguage(), ENT_QUOTES, 'UTF-8') ?>">
-    <meta name="generator" content="LiteBansU 3.0">
+    <meta name="generator" content="Realms Bans 3.0">
     <meta name="coverage" content="Worldwide">
     <meta name="target" content="all">
     <meta name="HandheldFriendly" content="True">
@@ -302,7 +302,7 @@
         <div class="container">
             <a class="navbar-brand" href="<?= htmlspecialchars(url(), ENT_QUOTES, 'UTF-8') ?>">
                 <div class="navbar-brand-icon">
-                    <i class="fas fa-hammer"></i>
+                    <i class="fas fa-shield-halved"></i>
                 </div>
                 <span><?= htmlspecialchars($config['site_name'] ?? 'LiteBans', ENT_QUOTES, 'UTF-8') ?></span>
             </a>
@@ -404,6 +404,14 @@
                                 'sr' => 'SR',
                                 'tr' => 'TR',
                                 'cn' => 'CN',
+                                'nl' => 'NL',
+                                'pt' => 'PT',
+                                'ko' => 'KO',
+                                'uk' => 'UK',
+                                'vi' => 'VI',
+                                'id' => 'ID',
+                                'sv' => 'SV',
+                                'no' => 'NO',
                             ];
                             ?>
                             <i class="fas fa-globe"></i>
