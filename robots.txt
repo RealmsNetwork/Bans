@@ -1,4 +1,4 @@
-# robots.txt for LiteBansU
+# robots.txt for Realms Bans
 # Public punishment history is intended to be indexable by both
 # traditional search engines and modern AI/LLM crawlers.
 
@@ -125,7 +125,7 @@ Allow: /
 # ---------------------------------------------------------------------------
 # Sitemap & host
 # ---------------------------------------------------------------------------
-Sitemap: /sitemap.xml
+Sitemap: https://bans.realmsweb.work.gd/sitemap.xml
 
 # Crawl-delay (seconds) - polite default; ignored by Googlebot
 Crawl-delay: 1
