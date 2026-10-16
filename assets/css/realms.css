@@ -262,6 +262,10 @@ textarea.form-control:focus {
 
 .stat-card-main,
 .stat-card-compact {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
   position: relative;
   background: var(--rb-panel) !important;
   color: var(--rb-text) !important;
@@ -294,13 +298,20 @@ textarea.form-control:focus {
 .stat-icon-compact {
   width: 42px !important;
   height: 42px !important;
+  flex: 0 0 42px;
   display: grid !important;
   place-items: center !important;
   border-radius: 10px !important;
   background: var(--rb-panel-3) !important;
   color: var(--rb-primary-2) !important;
-  margin-bottom: 12px;
+  margin: 0 !important;
 }
+.stat-content-main,
+.stat-content-compact {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .stat-number-main,
 .stat-number-compact {
   font-size: clamp(1.7rem, 3vw, 2.35rem) !important;
@@ -569,4 +580,16 @@ textarea.form-control:focus {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+
+/* Keep the detailed statistics cards stacked on narrow phones. */
+@media (max-width: 576px) {
+  .stat-card-main {
+    flex-direction: column;
+    text-align: center;
+  }
+  .stat-card-main .stat-content-main {
+    align-items: center;
+  }
 }
