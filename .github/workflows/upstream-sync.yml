@@ -1,0 +1,79 @@
+name: Sync LitebansU upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 7 * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/upstream-sync.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: upstream-sync-main
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'RealmsNetwork/Bans'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out RealmsNetwork/Bans
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Merge upstream, preferring RealmsNetwork on conflicts
+        shell: bash
+        env:
+          UPSTREAM_REPO: https://github.com/Yamiru/LitebansU.git
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add upstream "$UPSTREAM_REPO"
+          git fetch --no-tags upstream main
+
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "Upstream is already included in main."
+            exit 0
+          fi
+
+          set +e
+          git merge --no-ff --no-commit -X ours upstream/main
+          merge_status=$?
+          set -e
+
+          if [ "$merge_status" -ne 0 ] || [ -n "$(git diff --name-only --diff-filter=U)" ]; then
+            if [ -z "$(git diff --name-only --diff-filter=U)" ]; then
+              echo "Merge failed without ordinary file conflicts; stopping rather than guessing."
+              exit "$merge_status"
+            fi
+
+            while IFS= read -r -d '' file; do
+              if git cat-file -e "HEAD:$file" >/dev/null 2>&1; then
+                # Keep the current RealmsNetwork file when Git cannot auto-merge it.
+                git checkout HEAD -- "$file"
+                git add -- "$file"
+                echo "Kept RealmsNetwork version of: $file"
+              else
+                # If the current fork deleted the file, keep that deletion.
+                git rm -f --ignore-unmatch -- "$file"
+                echo "Kept RealmsNetwork deletion of: $file"
+              fi
+            done < <(git diff --name-only --diff-filter=U -z)
+          fi
+
+          if ! git rev-parse -q --verify MERGE_HEAD >/dev/null; then
+            echo "No merge was created; stopping."
+            exit 1
+          fi
+
+          git commit -m "Merge upstream Yamiru/LitebansU"
+          git push origin HEAD:main
