@@ -6,7 +6,7 @@
  *
  *  Plugin Name:   Realms Bans
  *  Description:   A modern, secure, and responsive web interface for LiteBans punishment management system.
- *  Version:       3.9
+ *  Version:       5.1
  *  Market URI:    https://builtbybit.com/resources/litebansu-litebans-website.69448/
  *  Author URI:    https://yamiru.com
  *  License:       MIT
@@ -15,6 +15,11 @@
  */
 
 declare(strict_types=1);
+
+// Compress dynamic pages even when the web server does not (Apache's mod_deflate skips this if it already did)
+if (extension_loaded('zlib') && !ini_get('zlib.output_compression') && !headers_sent()) {
+    ini_set('zlib.output_compression', '1');
+}
 
 // Error handling - capture all errors
 error_reporting(E_ALL);
@@ -58,6 +63,8 @@ function showErrorPage(int $code, string $title, string $message, ?string $detai
         $detailsHtml = "<div class='alert alert-secondary mt-3 text-start'><small><strong>Debug info:</strong><br><pre style='white-space: pre-wrap; word-break: break-all; margin: 0; font-size: 12px;'>{$safeDetails}</pre></small></div>";
     }
 
+    $assetBase = defined('BASE_PATH') ? rtrim(BASE_PATH, '/') : '';
+
     return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -66,8 +73,8 @@ function showErrorPage(int $code, string $title, string $message, ?string $detai
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>{$code} - {$safeTitle}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="{$assetBase}/assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="{$assetBase}/assets/css/icons.css" rel="stylesheet">
     <style>
         body { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
         .error-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-width: 600px; }
@@ -183,6 +190,7 @@ $requiredFiles = [
     'core/ThemeManager.php',
     'core/DatabaseRepository.php',
     'core/RememberMeManager.php',
+    'core/SiteExtras.php',
     'controllers/BaseController.php',
     'controllers/HomeController.php',
     'controllers/PunishmentsController.php',
@@ -190,7 +198,8 @@ $requiredFiles = [
     'controllers/StatsController.php',
     'controllers/AdminController.php',
     'controllers/ProtestController.php',
-    'controllers/AiController.php'
+    'controllers/AiController.php',
+    'controllers/PrivacyController.php'
 ];
 
 foreach ($requiredFiles as $file) {
@@ -245,11 +254,34 @@ function url(string $path = ''): string {
     return $basePath . '/' . $path;
 }
 
+/**
+ * URL of a combined asset bundle (assets/bundle.php): all CSS in one request, or the main JS,
+ * served with gzip and a one-year cache. The version changes when any source file changes.
+ */
+/**
+ * Base URL for CSS, JS, fonts and images. ASSETS_URL in .env (e.g. https://static.example.com or https://example.com/mcbans)
+ * serves them from a cookie-free domain; empty keeps them on this site.
+ */
+function assetBase(): string {
+    $url = trim((string)\core\EnvLoader::get('ASSETS_URL', ''));
+    return preg_match('#^https?://[^\s/?\#]+(/[\w./-]*)?$#i', rtrim($url, '/')) ? rtrim($url, '/') : rtrim(BASE_PATH, '/');
+}
+
+function bundle(string $type): string {
+    $files = (require BASE_DIR . '/assets/bundle-map.php')[$type] ?? [];
+    $stamp = '';
+    foreach ($files as $file) {
+        $full = BASE_DIR . '/assets/' . $file;
+        $stamp .= $file . (is_file($full) ? filemtime($full) . ':' . filesize($full) : '') . '|';
+    }
+    return assetBase() . '/assets/bundle.php?t=' . ($type === 'js' ? 'js' : 'css') . '&v=' . substr(md5($stamp), 0, 10);
+}
+
 function asset(string $path): string {
     $path = ltrim($path, '/');
     $fullPath = BASE_DIR . '/' . $path;
     $version = file_exists($fullPath) ? '?v=' . substr(md5_file($fullPath), 0, 8) : '';
-    return rtrim(BASE_PATH, '/') . '/' . $path . $version;
+    return assetBase() . '/' . $path . $version;
 }
 
 /**
@@ -321,7 +353,13 @@ try {
         // Prevent the browser from serving a cached (old-language) version of the destination
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Pragma: no-cache');
+        // Drop only ?lang=, so pages like /detail?type=ban&id=12 keep their parameters
         $cleanUrl = strtok($_SERVER['REQUEST_URI'], '?');
+        $keptQuery = $_GET;
+        unset($keptQuery['lang']);
+        if ($keptQuery) {
+            $cleanUrl .= '?' . http_build_query($keptQuery);
+        }
         // 303 See Other forces a GET on the new URL and discourages caching of this response
         header("Location: " . $cleanUrl, true, 303);
         exit;
@@ -435,6 +473,12 @@ try {
         (new StatsController($repository, $lang, $theme, $config))->clearCache();
     } elseif ($requestUri === '/detail' || $requestUri === '/detail.php' || (isset($route[0]) && $route[0] === 'detail')) {
         (new DetailController($repository, $lang, $theme, $config))->show();
+    } elseif ($requestUri === '/privacy') {
+        (new PrivacyController($repository, $lang, $theme, $config))->index();
+    } elseif (preg_match('#^/([a-f0-9]{32})\.txt$#', $requestUri, $keyMatch) && \core\SiteExtras::indexNowKey(false) === $keyMatch[1]) {
+        // IndexNow ownership proof: the key file must contain the key
+        header('Content-Type: text/plain; charset=UTF-8');
+        echo $keyMatch[1];
     } elseif ($requestUri === '/protest') {
         (new ProtestController($repository, $lang, $theme, $config))->index();
     } elseif ($requestUri === '/protest/submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -471,6 +515,10 @@ try {
             '/admin/search-punishments' => $admin->searchPunishments(),
             '/admin/remove-punishment'  => $admin->removePunishment(),
             '/admin/modify-reason'      => $admin->modifyReason(),
+            '/admin/case-evidence'      => $admin->caseEvidence(),
+            '/admin/site-extras'        => $admin->siteExtras(),
+            '/admin/indexnow'           => $admin->indexNow(),
+            '/admin/check-llms'         => $admin->checkLlms(),
             '/admin/save-settings'      => $admin->saveSettings(),
             '/admin/oauth-callback'     => $admin->oauthCallback(),
             '/admin/oauth-prepare'      => $admin->oauthPrepare(),

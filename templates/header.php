@@ -1,3 +1,4 @@
+<?php $siteExtras = \core\SiteExtras::get(); $allowCrawlers = (bool)$siteExtras['allow_crawlers']; $gaId = \core\SiteExtras::gaId(); ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($lang->getCurrentLanguage(), ENT_QUOTES, 'UTF-8') ?>" dir="<?= $lang->getCurrentLanguage() === 'ar' ? 'rtl' : 'ltr' ?>">
 <head>
@@ -6,7 +7,7 @@
     <meta name="csrf-token" content="<?= htmlspecialchars(SecurityManager::generateCsrfToken(), ENT_QUOTES, 'UTF-8') ?>">
     <meta name="base-path" content="<?= htmlspecialchars($config['base_path'], ENT_QUOTES, 'UTF-8') ?>">
     <meta http-equiv="Content-Type" content="text/html; charset=<?= htmlspecialchars($config['site_charset'] ?? 'UTF-8', ENT_QUOTES, 'UTF-8') ?>">
-    <meta name="robots" content="<?= htmlspecialchars($config['site_robots'] ?? 'index, follow', ENT_QUOTES, 'UTF-8') ?>">
+    <meta name="robots" content="<?= htmlspecialchars($allowCrawlers ? ($config['site_robots'] ?? 'index, follow') : 'noindex, nofollow', ENT_QUOTES, 'UTF-8') ?>">
 
     <title><?php
         if (isset($title)) {
@@ -63,10 +64,10 @@
     <meta name="twitter:site" content="<?= htmlspecialchars($config['site_twitter_site'], ENT_QUOTES, 'UTF-8') ?>">
     <?php endif; ?>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="<?= htmlspecialchars(asset('assets/vendor/bootstrap/bootstrap.min.css'), ENT_QUOTES, 'UTF-8') ?>" rel="stylesheet">
+    <link href="<?= htmlspecialchars(asset('assets/fonts/fonts.css'), ENT_QUOTES, 'UTF-8') ?>" rel="stylesheet">
+    <link rel="preload" href="<?= htmlspecialchars(asset('assets/fonts/public-latin.woff2'), ENT_QUOTES, 'UTF-8') ?>" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="<?= htmlspecialchars(asset('assets/fonts/bricolage-latin.woff2'), ENT_QUOTES, 'UTF-8') ?>" as="font" type="font/woff2" crossorigin>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -87,17 +88,19 @@
             .navbar-brand{font-size:1.05rem}
         }
         @media (max-width:1399.98px){
-            .navbar-toggler{display:block;margin-left:auto}
+            .navbar-toggler{display:block}
             .navbar-collapse{position:absolute;top:100%;left:0;right:0;z-index:1030;background:var(--bg-primary);border-top:1px solid var(--border-color);box-shadow:var(--shadow-lg);padding:var(--space-md);display:none;flex-direction:column;gap:var(--space-md);max-height:calc(100vh - 80px);overflow-y:auto;-webkit-overflow-scrolling:touch}
             .navbar-collapse.show{display:flex}
             .navbar-nav{flex-direction:column;width:100%;gap:var(--space-xs)}
             .nav-item{width:100%}
             .nav-link{width:100%;padding:var(--space-md);padding-right:var(--space-xl);justify-content:space-between}
             .nav-link .badge{position:static;transform:none;margin-left:auto}
-            .navbar-controls{width:100%;justify-content:space-between;padding-top:var(--space-md);border-top:1px solid var(--border-color);flex-wrap:wrap;gap:var(--space-sm);margin-left:0}
-            .navbar-controls .dropdown{flex:1}
-            .navbar-controls .btn-navbar{width:100%}
-            .theme-toggle-wrapper{margin-left:auto}
+            .navbar-modern .container{flex-wrap:nowrap}
+            .navbar-brand{order:0;flex:1 1 auto;min-width:0}
+            .navbar-brand span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+            .navbar-controls{order:1;margin-left:var(--space-sm);flex-wrap:nowrap}
+            .navbar-toggler{order:2;margin-left:var(--space-sm)}
+            .navbar-collapse{order:3}
         }
         @media (min-width:992px) and (max-width:1279.98px){
             .table-responsive .table thead th,.table-responsive .table tbody td{padding:.375rem .5rem;font-size:.8125rem}
@@ -151,10 +154,12 @@
     <meta name="ICBM" content="<?= htmlspecialchars($config['seo_geo_position'], ENT_QUOTES, 'UTF-8') ?>">
     <?php endif; ?>
 
+    <?php if ($allowCrawlers): ?>
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <meta name="googlebot-news" content="index, follow">
-    <?php if (isset($config['seo_ai_training']) && $config['seo_ai_training'] === false): ?>
+    <?php endif; ?>
+    <?php if (!$allowCrawlers || (isset($config['seo_ai_training']) && $config['seo_ai_training'] === false)): ?>
     <meta name="robots" content="noai, noimageai">
     <meta name="GPTBot" content="noindex, nofollow">
     <meta name="ClaudeBot" content="noindex, nofollow">
@@ -185,27 +190,11 @@
     <meta name="twitter:image" content="<?= htmlspecialchars($config['site_og_image'], ENT_QUOTES, 'UTF-8') ?>">
     <?php endif; ?>
 
-    <link rel="dns-prefetch" href="//fonts.googleapis.com">
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
 
     <?php if (isset($config['seo_alternate_languages']) && is_array($config['seo_alternate_languages'])): ?>
     <?php foreach ($config['seo_alternate_languages'] as $langCode => $langUrl): ?>
     <link rel="alternate" hreflang="<?= htmlspecialchars($langCode, ENT_QUOTES, 'UTF-8') ?>" href="<?= htmlspecialchars($langUrl, ENT_QUOTES, 'UTF-8') ?>">
     <?php endforeach; ?>
-    <?php else: ?>
-    <?php
-
-        $sep = $canonicalQuery === '' ? '?' : '&';
-        foreach ($lang->getSupportedLanguages() as $altCode):
-
-            $hreflangCode = $altCode === 'cn' ? 'zh' : $altCode;
-            $altUrl = $canonicalUrl . $sep . 'lang=' . $altCode;
-    ?>
-    <link rel="alternate" hreflang="<?= htmlspecialchars($hreflangCode, ENT_QUOTES, 'UTF-8') ?>" href="<?= htmlspecialchars($altUrl, ENT_QUOTES, 'UTF-8') ?>">
-    <?php endforeach; ?>
-    <link rel="alternate" hreflang="x-default" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
     <?php endif; ?>
 
     <script type="application/ld+json">
@@ -296,6 +285,13 @@
     }
     </script>
     <?php endif; ?>
+    <?php if ($gaId !== '' || !empty($siteExtras['cookie_banner'])): ?>
+    <script>window.LB_CONSENT = { ga: <?= json_encode($gaId) ?>, banner: <?= !empty($siteExtras['cookie_banner']) ? 'true' : 'false' ?> };</script>
+    <?php endif; ?>
+    <?php if (trim((string)$siteExtras['custom_head']) !== ''): ?>
+    <?= $siteExtras['custom_head'] ?>
+
+    <?php endif; ?>
 </head>
 <body class="<?= htmlspecialchars($theme->getThemeClasses()['body'], ENT_QUOTES, 'UTF-8') ?>">
     <nav class="navbar navbar-expand-xxl navbar-modern" id="mainNavbar">
@@ -380,6 +376,7 @@
                     </li>
                     <?php endif; ?>
                 </ul>
+            </div>
 
                 <div class="navbar-controls d-flex align-items-center">
                     <div class="dropdown">
@@ -410,21 +407,20 @@
                         </ul>
                     </div>
 
-                    <div class="theme-toggle-wrapper">
-                        <input type="checkbox" id="theme-toggle" class="theme-toggle-checkbox"
-                               <?= $theme->getCurrentTheme() === 'dark' ? 'checked' : '' ?>>
-                        <label for="theme-toggle" class="theme-toggle-label">
-                            <i class="fas fa-sun"></i>
-                            <i class="fas fa-moon"></i>
-                            <span class="theme-toggle-ball"></span>
-                        </label>
-                    </div>
+                <div class="theme-toggle-wrapper">
+                    <input type="checkbox" id="theme-toggle" class="theme-toggle-checkbox"
+                           <?= $theme->getCurrentTheme() === 'dark' ? 'checked' : '' ?>>
+                    <label for="theme-toggle" class="theme-toggle-label">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                        <span class="theme-toggle-ball"></span>
+                    </label>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="hero-gradient"></div>
+    <div class="hero-gradient" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
     <main class="main-content">
         <div class="container">
