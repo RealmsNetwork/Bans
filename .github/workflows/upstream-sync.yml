@@ -56,6 +56,10 @@ jobs:
               exit "$merge_status"
             fi
 
+            # Materialize the list first so Git never reads the index while we update it.
+            conflicts_file="$RUNNER_TEMP/upstream-conflicts"
+            git diff --name-only --diff-filter=U -z > "$conflicts_file"
+
             while IFS= read -r -d '' file; do
               if git cat-file -e "HEAD:$file" >/dev/null 2>&1; then
                 # Keep the current RealmsNetwork file when Git cannot auto-merge it.
@@ -67,7 +71,7 @@ jobs:
                 git rm -f --ignore-unmatch -- "$file"
                 echo "Kept RealmsNetwork deletion of: $file"
               fi
-            done < <(git diff --name-only --diff-filter=U -z)
+            done < "$conflicts_file"
           fi
 
           if ! git rev-parse -q --verify MERGE_HEAD >/dev/null; then
