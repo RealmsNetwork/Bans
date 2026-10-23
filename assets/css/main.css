@@ -10,7 +10,7 @@
 @import url('themes.css');
 @import url('utilities.css');
 @import url('responsive.css');
-@import url('pages/home.css');
+@import url('pages/home.css?v=20261023-empty-state-icon-size');
 @import url('pages/stats.css');
 @import url('pages/punishments.css');
 @import url('pages/detail.css');
