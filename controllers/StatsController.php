@@ -147,10 +147,13 @@ class StatsController extends BaseController
         try {
             $bansTable = $this->repository->getTablePrefix() . 'bans';
             $historyTable = $this->repository->getTablePrefix() . 'history';
+            $activeFlag = $this->repository->getDriver() === 'pgsql'
+                ? 'CAST(b.active AS INTEGER)'
+                : 'CAST(b.active AS UNSIGNED)';
             
             $sql = "SELECT b.uuid, h.name as player_name, COUNT(*) as ban_count,
                            MAX(b.time) as last_ban_time,
-                           SUM(CASE WHEN b.active = 1 THEN 1 ELSE 0 END) as active_bans
+                           SUM(CASE WHEN {$activeFlag} = 1 THEN 1 ELSE 0 END) as active_bans
                     FROM {$bansTable} b
                     LEFT JOIN (
                         SELECT h1.uuid, h1.name
