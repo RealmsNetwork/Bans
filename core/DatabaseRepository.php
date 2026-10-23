@@ -127,11 +127,13 @@ class DatabaseRepository
                 $orderClause = "{$sortColumn} {$order}";
             }
             
-            $where = $activeOnly ? 'WHERE b.active = 1 AND b.uuid IS NOT NULL AND b.uuid != \'#\'' : 'WHERE b.uuid IS NOT NULL AND b.uuid != \'#\'';
+            $activeFlag = $this->castInt('b.active');
+            $where = $activeOnly ? "WHERE {$activeFlag} = 1 AND b.uuid IS NOT NULL AND b.uuid != '#'" : "WHERE b.uuid IS NOT NULL AND b.uuid != '#'";
             
             // Add silent filter if needed
             if (!$showSilent) {
-                $where .= ' AND (b.silent = 0 OR b.silent IS NULL)';
+                $silentFlag = $this->castInt('b.silent');
+                $where .= " AND ({$silentFlag} = 0 OR b.silent IS NULL)";
             }
             
             $activeCast = $this->castInt('b.active');
@@ -192,10 +194,12 @@ class DatabaseRepository
             
             $orderClause = "{$sortColumn} {$order}";
             
-            $where = $activeOnly ? 'WHERE m.active = 1 AND m.uuid IS NOT NULL AND m.uuid != \'#\'' : 'WHERE m.uuid IS NOT NULL AND m.uuid != \'#\'';
+            $activeFlag = $this->castInt('m.active');
+            $where = $activeOnly ? "WHERE {$activeFlag} = 1 AND m.uuid IS NOT NULL AND m.uuid != '#'" : "WHERE m.uuid IS NOT NULL AND m.uuid != '#'";
             
             if (!$showSilent) {
-                $where .= ' AND (m.silent = 0 OR m.silent IS NULL)';
+                $silentFlag = $this->castInt('m.silent');
+                $where .= " AND ({$silentFlag} = 0 OR m.silent IS NULL)";
             }
             
             $activeCast = $this->castInt('m.active');
@@ -456,7 +460,8 @@ class DatabaseRepository
                 $stats[$table] = (int)($result['total'] ?? 0);
                 
                 if (in_array($table, ['bans', 'mutes'])) {
-                    $stmt = $this->connection->query("SELECT COUNT(*) as active FROM {$fullTable} WHERE active = 1 AND uuid IS NOT NULL AND uuid != '#'");
+                    $activeFlag = $this->castInt('active');
+                    $stmt = $this->connection->query("SELECT COUNT(*) as active FROM {$fullTable} WHERE {$activeFlag} = 1 AND uuid IS NOT NULL AND uuid != '#'");
                     $result = $stmt->fetch();
                     $stats[$table . '_active'] = (int)($result['active'] ?? 0);
                 }
@@ -524,7 +529,8 @@ class DatabaseRepository
             $fullTable = $this->tablePrefix . $table;
             
             if (in_array($table, ['bans', 'mutes'])) {
-                $where = $activeOnly ? 'WHERE active = 1 AND uuid IS NOT NULL AND uuid != \'#\'' : 'WHERE uuid IS NOT NULL AND uuid != \'#\'';
+                $activeFlag = $this->castInt('active');
+                $where = $activeOnly ? "WHERE {$activeFlag} = 1 AND uuid IS NOT NULL AND uuid != '#'" : "WHERE uuid IS NOT NULL AND uuid != '#'";
             } else {
                 $where = 'WHERE uuid IS NOT NULL AND uuid != \'#\'';
             }
@@ -624,7 +630,7 @@ class DatabaseRepository
             
             $sql = "SELECT b.uuid, h.name as player_name, COUNT(*) as ban_count,
                            MAX(b.time) as last_ban_time,
-                           SUM(CASE WHEN b.active = 1 THEN 1 ELSE 0 END) as active_bans
+                           SUM(CASE WHEN {$this->castInt('b.active')} = 1 THEN 1 ELSE 0 END) as active_bans
                     FROM {$bansTable} b
                     LEFT JOIN (
                         SELECT h1.uuid, h1.name
