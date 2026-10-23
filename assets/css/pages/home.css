@@ -140,6 +140,11 @@
     }
 }
 
+/* Empty-state icons should remain subtle instead of inheriting the oversized Font Awesome 2x utility. */
+.empty-state-icon {
+    font-size: 1.25rem;
+}
+
 /* Recent Activity Cards */
 .punishment-list {
     display: flex;
