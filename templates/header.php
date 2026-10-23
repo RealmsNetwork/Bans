@@ -319,36 +319,28 @@
                         <a class="nav-link <?= ($currentPage ?? '') === 'bans' ? 'active' : '' ?>" href="<?= htmlspecialchars(url('bans'), ENT_QUOTES, 'UTF-8') ?>">
                             <i class="fas fa-ban"></i>
                             <span><?= htmlspecialchars($lang->get('nav.bans'), ENT_QUOTES, 'UTF-8') ?></span>
-                            <?php if (isset($GLOBALS['stats']['bans_active']) && $GLOBALS['stats']['bans_active'] > 0): ?>
-                                <span class="badge"><?= htmlspecialchars((string)$GLOBALS['stats']['bans_active'], ENT_QUOTES, 'UTF-8') ?></span>
-                            <?php endif; ?>
+                            <span class="badge"><?= number_format((int)($GLOBALS['stats']['bans_active'] ?? 0)) ?></span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link <?= ($currentPage ?? '') === 'mutes' ? 'active' : '' ?>" href="<?= htmlspecialchars(url('mutes'), ENT_QUOTES, 'UTF-8') ?>">
                             <i class="fas fa-volume-mute"></i>
                             <span><?= htmlspecialchars($lang->get('nav.mutes'), ENT_QUOTES, 'UTF-8') ?></span>
-                            <?php if (isset($GLOBALS['stats']['mutes_active']) && $GLOBALS['stats']['mutes_active'] > 0): ?>
-                                <span class="badge"><?= htmlspecialchars((string)$GLOBALS['stats']['mutes_active'], ENT_QUOTES, 'UTF-8') ?></span>
-                            <?php endif; ?>
+                            <span class="badge"><?= number_format((int)($GLOBALS['stats']['mutes_active'] ?? 0)) ?></span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link <?= ($currentPage ?? '') === 'warnings' ? 'active' : '' ?>" href="<?= htmlspecialchars(url('warnings'), ENT_QUOTES, 'UTF-8') ?>">
                             <i class="fas fa-exclamation-triangle"></i>
                             <span><?= htmlspecialchars($lang->get('nav.warnings'), ENT_QUOTES, 'UTF-8') ?></span>
-                            <?php if (isset($GLOBALS['stats']['warnings']) && $GLOBALS['stats']['warnings'] > 0): ?>
-                                <span class="badge"><?= htmlspecialchars((string)$GLOBALS['stats']['warnings'], ENT_QUOTES, 'UTF-8') ?></span>
-                            <?php endif; ?>
+                            <span class="badge"><?= number_format((int)($GLOBALS['stats']['warnings'] ?? 0)) ?></span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link <?= ($currentPage ?? '') === 'kicks' ? 'active' : '' ?>" href="<?= htmlspecialchars(url('kicks'), ENT_QUOTES, 'UTF-8') ?>">
                             <i class="fas fa-sign-out-alt"></i>
                             <span><?= htmlspecialchars($lang->get('nav.kicks'), ENT_QUOTES, 'UTF-8') ?></span>
-                            <?php if (isset($GLOBALS['stats']['kicks']) && $GLOBALS['stats']['kicks'] > 0): ?>
-                                <span class="badge"><?= htmlspecialchars((string)$GLOBALS['stats']['kicks'], ENT_QUOTES, 'UTF-8') ?></span>
-                            <?php endif; ?>
+                            <span class="badge"><?= number_format((int)($GLOBALS['stats']['kicks'] ?? 0)) ?></span>
                         </a>
                     </li>
                     <?php if ($config['show_menu_stats'] ?? true): ?>
