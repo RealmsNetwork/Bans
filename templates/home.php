@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="card-body">
                 <?php if (empty($recentBans)): ?>
                     <div class="text-center py-4">
-                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                        <i class="fas fa-check-circle empty-state-icon text-success mb-2"></i>
                         <p class="text-muted mb-0"><?= htmlspecialchars($lang->get('home.no_recent_bans'), ENT_QUOTES, 'UTF-8') ?></p>
                     </div>
                 <?php else: ?>
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="card-body">
                 <?php if (empty($recentMutes)): ?>
                     <div class="text-center py-4">
-                        <i class="fas fa-volume-up fa-2x text-success mb-2"></i>
+                        <i class="fas fa-volume-up empty-state-icon text-success mb-2"></i>
                         <p class="text-muted mb-0"><?= htmlspecialchars($lang->get('home.no_recent_mutes'), ENT_QUOTES, 'UTF-8') ?></p>
                     </div>
                 <?php else: ?>
