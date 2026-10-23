@@ -631,3 +631,13 @@ textarea.form-control:focus {
   order: 2 !important;
   margin: 4px 0 0 !important;
 }
+
+
+/* Navbar alignment fix: links without a count badge must not push their label into the far-right badge position on compact navigation layouts. */
+.navbar-nav .nav-link {
+  justify-content: flex-start !important;
+  gap: .5rem;
+}
+.navbar-nav .nav-link .badge {
+  margin-left: auto;
+}
