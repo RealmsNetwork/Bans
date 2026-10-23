@@ -593,3 +593,41 @@ textarea.form-control:focus {
     align-items: center;
   }
 }
+
+
+/* Stat-card layout guard: keep the count above its matching label.
+   This explicit page-scoped rule prevents legacy/theme flex styles from
+   moving labels into the count position. */
+.stats-grid-main .stat-card-main .stat-content-main,
+.stats-grid-2x2 .stat-card-compact .stat-content-compact {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  min-width: 0;
+}
+.stats-grid-main .stat-card-main .stat-number-main,
+.stats-grid-2x2 .stat-card-compact .stat-number-compact {
+  display: block !important;
+  position: static !important;
+  order: 0 !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  margin: 0 !important;
+  line-height: 1.1 !important;
+}
+.stats-grid-main .stat-card-main .stat-label-main,
+.stats-grid-2x2 .stat-card-compact .stat-label-compact {
+  display: block !important;
+  position: static !important;
+  order: 1 !important;
+  margin: 6px 0 0 !important;
+}
+.stats-grid-main .stat-card-main .stat-total-main,
+.stats-grid-2x2 .stat-card-compact .stat-total-compact {
+  display: block !important;
+  position: static !important;
+  order: 2 !important;
+  margin: 4px 0 0 !important;
+}
