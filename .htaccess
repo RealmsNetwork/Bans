@@ -70,7 +70,9 @@ Header always unset X-Powered-By
 
 # Hide directories from direct access
 <IfModule mod_rewrite.c>
-    RewriteRule ^(config|core|controllers|templates|lang|data)/ - [F,L]
+    RewriteRule ^(config|core|controllers|templates|lang|data|logs|demos/data|nginx)/ - [F,L]
+    # Only these PHP entry points may run (same whitelist as the nginx config)
+    RewriteRule ^(?!index\.php$|assets/bundle\.php$|demos/case-evidence\.php$).+\.php$ - [F,L]
 </IfModule>
 
 # Don't rewrite requests to index.php itself

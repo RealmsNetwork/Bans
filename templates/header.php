@@ -367,6 +367,14 @@
                         </a>
                     </li>
                     <?php endif; ?>
+                    <?php if ($homeLink = \core\SiteExtras::homeLink($config)): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= htmlspecialchars($homeLink['url'], ENT_QUOTES, 'UTF-8') ?>"<?= $homeLink['newtab'] ? ' target="_blank" rel="noopener"' : '' ?>>
+                            <i class="fas fa-globe"></i>
+                            <span><?= htmlspecialchars($homeLink['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                        </a>
+                    </li>
+                    <?php endif; ?>
                 </ul>
             </div>
 

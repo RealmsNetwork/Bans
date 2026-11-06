@@ -32,6 +32,11 @@ class SiteExtras
         'custom_footer' => '',
         'privacy' => [],
         'indexnow_key' => '',
+        // null = fall back to the .env value
+        'home_link_enabled' => null,
+        'home_link_url' => null,
+        'home_link_label' => null,
+        'home_link_newtab' => null,
     ];
 
     private const ALLOWED_TAGS = '<p><br><strong><b><em><i><u><ul><ol><li><h2><h3><h4><a><blockquote><code><hr>';
@@ -64,6 +69,30 @@ class SiteExtras
         @unlink(self::LEGACY);
         self::$cache = $data;
         return true;
+    }
+
+    /** Only http(s) URLs and site paths: anything else (javascript:, data:) is refused. */
+    public static function normalizeLinkUrl(string $value): string
+    {
+        $url = trim($value);
+        return preg_match('#^(https?://[^\s<>"]+|/[^\s<>"]*)$#i', $url) ? $url : '';
+    }
+
+    /** The "main website" menu item: [url, label, newtab], or null when it is off. Admin settings beat .env. */
+    public static function homeLink(array $config): ?array
+    {
+        $x = self::get();
+        $url = self::normalizeLinkUrl((string)(($x['home_link_url'] ?? '') !== '' ? $x['home_link_url'] : ($config['home_link_url'] ?? '')));
+        $enabled = $x['home_link_enabled'] ?? ($url !== '');
+        if (!$enabled || $url === '') {
+            return null;
+        }
+        $label = trim((string)(($x['home_link_label'] ?? '') !== '' ? $x['home_link_label'] : ($config['home_link_label'] ?? '')));
+        return [
+            'url' => $url,
+            'label' => $label !== '' ? $label : 'Main website',
+            'newtab' => (bool)($x['home_link_newtab'] ?? ($config['home_link_newtab'] ?? false)),
+        ];
     }
 
     /** A valid Google tag ID (G-, GT-, AW- or UA-), or an empty string. */

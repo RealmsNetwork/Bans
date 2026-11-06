@@ -123,11 +123,24 @@ body {
     color: var(--text-primary);
 }
 
+.nav-link.active {
+    background: transparent !important;
+}
+
+/* Icons are SVG masks painted with background-color: keep it, only set the colour */
 .nav-link.active,
 .nav-link.active i,
-.nav-link.active span {
-    background: transparent !important;
+.nav-link.active span:not(.badge) {
     color: var(--text-primary) !important;
+}
+
+.nav-link.active i {
+    background-color: currentColor !important;
+}
+
+.nav-link.active .badge {
+    background: var(--primary) !important;
+    color: #fff !important;
 }
 
 .nav-link.active {

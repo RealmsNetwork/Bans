@@ -283,8 +283,9 @@ class AiController extends BaseController
         foreach (['/*?lang=', '/*?theme=', '/*&lang=', '/*&theme='] as $disallow) {
             $lines[] = 'Disallow: ' . $disallow;
         }
+        $lines[] = 'Crawl-delay: 1';
         $lines[] = '';
-        
+
         $traditionalBots = ['Googlebot', 'Bingbot', 'DuckDuckBot', 'YandexBot'];
         $aiBots = [
             'GPTBot', 'ChatGPT-User', 'OAI-SearchBot',
@@ -326,11 +327,9 @@ class AiController extends BaseController
         }
         
         $lines[] = '# ---------------------------------------------------------------------------';
-        $lines[] = '# Sitemap & crawl delay';
+        $lines[] = '# Sitemap';
         $lines[] = '# ---------------------------------------------------------------------------';
         $lines[] = 'Sitemap: ' . $siteUrl . '/sitemap.xml';
-        $lines[] = '';
-        $lines[] = 'Crawl-delay: 1';
         
         $body = implode("\n", $lines) . "\n";
         

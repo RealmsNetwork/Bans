@@ -263,7 +263,7 @@ if (!$controller->isAuthenticated()) {
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <input type="text" class="form-control" id="admin-search-input" 
-                                       placeholder="Search by player name, UUID, reason, or staff...">
+                                       placeholder="Search by player name, UUID, IP, reason, or staff...">
                             </div>
                             <div class="col-md-3">
                                 <select class="form-control" id="admin-search-type">
@@ -914,6 +914,37 @@ if (!$controller->isAuthenticated()) {
                     </div>
                 </div>
 
+                <?php $homeLink = \core\SiteExtras::homeLink($config); ?>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3"><i class="fas fa-globe text-primary"></i> Main website menu item</h5>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="home-link-enabled" <?= $homeLink ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="home-link-enabled">Show a last menu item with a globe icon</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="home-link-url">Link</label>
+                                <input type="text" class="form-control" id="home-link-url" placeholder="https://example.com" value="<?= htmlspecialchars((string)($homeLink['url'] ?? $seoExtras['home_link_url'] ?? $config['home_link_url'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                                <small class="text-muted">https://, http:// or a path starting with /. Default comes from HOME_LINK_URL in .env.</small>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label" for="home-link-label">Text</label>
+                                <input type="text" class="form-control" id="home-link-label" maxlength="40" value="<?= htmlspecialchars((string)($homeLink['label'] ?? $config['home_link_label'] ?? 'Main website'), ENT_QUOTES, 'UTF-8') ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label" for="home-link-target">Open in</label>
+                                <select class="form-control" id="home-link-target">
+                                    <option value="0" <?= empty($homeLink['newtab']) ? 'selected' : '' ?>>Same tab</option>
+                                    <option value="1" <?= !empty($homeLink['newtab']) ? 'selected' : '' ?>>New tab</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="mb-3"><i class="fas fa-chart-line text-primary"></i> Google Analytics and cookies</h5>
@@ -1481,7 +1512,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     cookie_banner: document.getElementById('seo-cookie-banner').checked,
                     custom_head: document.getElementById('seo-custom-head').value,
                     custom_footer: document.getElementById('seo-custom-footer').value,
-                    privacy: changed
+                    privacy: changed,
+                    home_link_enabled: document.getElementById('home-link-enabled').checked,
+                    home_link_url: document.getElementById('home-link-url').value.trim(),
+                    home_link_label: document.getElementById('home-link-label').value.trim(),
+                    home_link_newtab: document.getElementById('home-link-target').value === '1'
                 });
                 show(savedBox, 'Saved. Changes are live on the public pages.');
             } catch (error) {
@@ -1609,6 +1644,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <small class="text-muted">
                                             <i class="fas fa-user-shield"></i> ${escapeHtml(p.staff)} 
                                             <i class="fas fa-clock ms-2"></i> ${escapeHtml(p.date)}
+                                            ${p.ip ? ' <i class="fas fa-network-wired ms-2"></i> ' + escapeHtml(p.ip) : ''}
                                             ${p.until ? ' <i class="fas fa-hourglass-end ms-2"></i> ' + escapeHtml(p.until) : ''}
                                             ${p.server !== 'Global' ? ' <i class="fas fa-server ms-2"></i> ' + escapeHtml(p.server) : ''}
                                         </small>

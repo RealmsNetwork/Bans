@@ -99,6 +99,11 @@ return [
     'show_menu_protest' => EnvLoader::get('SHOW_MENU_PROTEST', 'true') === 'true',
     'show_menu_stats' => EnvLoader::get('SHOW_MENU_STATS', 'true') === 'true',
     'show_menu_admin' => EnvLoader::get('SHOW_MENU_ADMIN', 'true') === 'true',
+
+    // Last menu item linking to the main website (the admin panel overrides these)
+    'home_link_url' => EnvLoader::get('HOME_LINK_URL', ''),
+    'home_link_label' => EnvLoader::get('HOME_LINK_LABEL', 'Main website'),
+    'home_link_newtab' => EnvLoader::get('HOME_LINK_NEWTAB', 'false') === 'true',
     
     // SEO Advanced Configuration (v2.7)
     'seo_enable_schema' => EnvLoader::get('SEO_ENABLE_SCHEMA', 'true') === 'true',

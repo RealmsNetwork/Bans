@@ -4,8 +4,14 @@
  * Complete configuration setup with all fields
  */
 
+// The wizard has no login: once the site is configured it must not run again (delete .env to reinstall)
+if (is_file(__DIR__ . '/.env')) {
+    http_response_code(403);
+    exit('Already installed. Delete install.php.');
+}
+
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', '0');
 
 session_start();
 
