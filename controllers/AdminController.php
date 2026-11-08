@@ -116,9 +116,16 @@ class AdminController extends BaseController
             return;
         }
         
+        // Simple captcha (checked after the attempt was counted, so guessing it is rate limited too)
+        if (!$this->checkLoginCaptcha()) {
+            $_SESSION['admin_error'] = 'Wrong answer to the security question. Please try again.';
+            $this->redirect(url('admin'));
+            return;
+        }
+
         $password = $_POST['password'] ?? '';
         $rememberMe = isset($_POST['remember_me']) && $_POST['remember_me'] === '1';
-        
+
         // Verify password
         $adminPassword = $this->config['admin_password'] ?? '';
         if (empty($adminPassword) || !password_verify($password, $adminPassword)) {
@@ -1307,6 +1314,24 @@ class AdminController extends BaseController
         return SecurityManager::rateLimitCheck('admin_login_' . ($_SERVER['REMOTE_ADDR'] ?? ''), self::MAX_LOGIN_ATTEMPTS, self::LOGIN_LOCKOUT_TIME);
     }
 
+    /** New "a + b" question for the password form; the answer lives only in the session. */
+    private function newLoginCaptcha(): string
+    {
+        $a = random_int(2, 9);
+        $b = random_int(2, 9);
+        $_SESSION['login_captcha'] = ['answer' => $a + $b, 'time' => time()];
+        return $a . ' + ' . $b;
+    }
+
+    /** Single use: the stored answer is dropped whether or not the guess was right. */
+    private function checkLoginCaptcha(): bool
+    {
+        $captcha = $_SESSION['login_captcha'] ?? null;
+        unset($_SESSION['login_captcha']);
+        $given = trim((string)($_POST['captcha'] ?? ''));
+        return is_array($captcha) && time() - $captcha['time'] < 600 && ctype_digit($given) && (int)$given === $captcha['answer'];
+    }
+
     /** Admin role check for sensitive endpoints; sends 403 and stops otherwise. */
     private function requireAdminRole(bool $json = true): void
     {
@@ -1351,6 +1376,7 @@ class AdminController extends BaseController
             'discordAuthEnabled' => $storageProblem === null && $authManager->isDiscordAuthEnabled(),
             'discordAuthUrl' => $storageProblem === null && $authManager->isDiscordAuthEnabled() ? $authManager->getDiscordAuthUrl() : '',
             'showPasswordLogin' => $showPasswordLogin,
+            'captchaQuestion' => $showPasswordLogin ? $this->newLoginCaptcha() : '',
             'allowPasswordLogin' => $allowPasswordLogin,
             'hasUsers' => $hasUsers
         ]);

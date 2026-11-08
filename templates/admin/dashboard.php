@@ -77,6 +77,12 @@ if (!$controller->isAuthenticated()) {
       <li class="nav-item" role="presentation"><button class="nav-link" id="seo-tracking-tab" data-bs-toggle="tab" data-bs-target="#seo-tracking" type="button"><i class="fas fa-bullseye"></i> SEO &amp; Tracking</button></li>
       <?php endif; ?>
     </ul>
+    <script>
+    // Keep the chosen tab in view when the row scrolls sideways
+    document.getElementById('adminTabs').addEventListener('shown.bs.tab', function (e) {
+        e.target.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    });
+    </script>
 
     <!-- Tab Content -->
     <div class="tab-content" id="adminTabContent">
@@ -1029,12 +1035,50 @@ if (!$controller->isAuthenticated()) {
     animation: fadeIn 0.3s ease-out;
 }
 
+/* One row at every width: it scrolls sideways when the tabs do not fit (swipe on phones, tablets and iOS) */
+#adminTabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x proximity;
+}
+#adminTabs::-webkit-scrollbar { display: none; }
+#adminTabs .nav-item { flex: 0 0 auto; scroll-snap-align: center; }
+#adminTabs .nav-link {
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 44px; /* iOS touch target */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+@media (max-width: 1399.98px) {
+    #adminTabs .nav-link { padding: 0.75rem 0.875rem; }
+}
+@media (max-width: 575.98px) {
+    #adminTabs .nav-link { padding: 0.625rem 0.75rem; font-size: 0.875rem; }
+    .admin-dashboard > .d-flex:first-child { flex-wrap: wrap; gap: 0.75rem; }
+    .admin-dashboard h1 { font-size: 1.5rem; }
+}
+/* iOS zooms into inputs under 16px */
+@media (max-width: 991.98px) {
+    .admin-dashboard input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+    .admin-dashboard select,
+    .admin-dashboard textarea { font-size: 16px; }
+    .admin-dashboard .table-responsive { -webkit-overflow-scrolling: touch; }
+}
+
 .nav-tabs .nav-link {
     color: var(--text-secondary);
     border: none;
     border-bottom: 2px solid transparent;
     background: transparent;
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem 1rem;
     font-weight: 500;
 }
 

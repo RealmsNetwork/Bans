@@ -90,7 +90,9 @@
         }
         @media (max-width:1399.98px){
             .navbar-toggler{display:block}
-            .navbar-collapse{position:absolute;top:100%;left:0;right:0;z-index:1030;background:var(--bg-primary);border-top:1px solid var(--border-color);box-shadow:var(--shadow-lg);padding:var(--space-md);display:none;flex-direction:column;gap:var(--space-md);max-height:calc(100vh - 80px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+            .navbar-collapse{position:absolute;top:100%;left:0;right:0;z-index:1030;background:var(--bg-primary);border-top:1px solid var(--border-color);box-shadow:var(--shadow-lg);padding:var(--space-md);display:none;flex-direction:column;gap:var(--space-md);max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+            .navbar-modern{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+            .nav-link,.navbar-toggler,.btn-navbar{min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
             .navbar-collapse.show{display:flex}
             .navbar-nav{flex-direction:column;width:100%;gap:var(--space-xs)}
             .nav-item{width:100%}
