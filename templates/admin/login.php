@@ -99,6 +99,16 @@
                                     </div>
                                 </div>
                                 
+                                <!-- Simple captcha -->
+                                <div class="mb-3">
+                                    <label for="captcha" class="form-label">
+                                        <i class="fas fa-shield-alt"></i>
+                                        Security question: <strong><?= htmlspecialchars((string)($captchaQuestion ?? ''), ENT_QUOTES, 'UTF-8') ?> = ?</strong>
+                                    </label>
+                                    <input type="text" class="form-control form-control-lg" id="captcha" name="captcha"
+                                           inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="3" required>
+                                </div>
+
                                 <!-- Remember Me for Password Login -->
                                 <div class="form-check mb-4">
                                     <input class="form-check-input" type="checkbox" name="remember_me" value="1" id="password-remember-me" checked>
